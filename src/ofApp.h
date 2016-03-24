@@ -1,9 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
+//#include "ofxPd.h"
 
 class ofApp : public ofBaseApp{
-
+    //ofxPd pd;
 public:
     void setup();
     void update();
@@ -20,6 +21,10 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    // audio callbacks
+    void audioReceived(float * input, int bufferSize, int nChannels);
+    void audioRequested(float * output, int bufferSize, int nChannels);
+
 
 };
 

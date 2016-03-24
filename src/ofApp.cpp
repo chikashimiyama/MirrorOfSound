@@ -2,6 +2,12 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+//    if(!pd.init(2, 2, 44100, 8, false)) {
+//        OF_EXIT_APP(1);
+//    }
+//    pd.start();
+//    Patch patch = pd.openPatch("test.pd");
+
 
 }
 
@@ -70,3 +76,11 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+void ofApp::audioReceived(float * input, int bufferSize, int nChannels) {
+   // pd.audioIn(input, bufferSize, nChannels);
+}
+
+//--------------------------------------------------------------
+void ofApp::audioRequested(float * output, int bufferSize, int nChannels) {
+    //pd.audioOut(output, bufferSize, nChannels);
+}
