@@ -1,30 +1,45 @@
 #pragma once
-
 #include "ofMain.h"
-//#include "ofxPd.h"
+#include "ofxPd.h"
+#include "ofxKinect.h"
+#include "Animation.hpp"
+#include "const.hpp"
 
 class ofApp : public ofBaseApp{
-    //ofxPd pd;
+
 public:
     void setup();
     void update();
     void draw();
 
-    void keyPressed(int key);
-    void keyReleased(int key);
-    void mouseMoved(int x, int y );
-    void mouseDragged(int x, int y, int button);
-    void mousePressed(int x, int y, int button);
-    void mouseReleased(int x, int y, int button);
-    void mouseEntered(int x, int y);
-    void mouseExited(int x, int y);
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     // audio callbacks
     void audioReceived(float * input, int bufferSize, int nChannels);
     void audioRequested(float * output, int bufferSize, int nChannels);
+    void exit();
 
+protected:
+    ofEasyCam cam;
+    ofxPd pd;
+    ofxKinect kinect;
+    std::vector<ofPoint> pointCloud;
+    std::vector<ofVec3f> eqLine3D;
+
+    //VBO
+    ofVbo eqLineVbo;
+    ofVbo pointCloudVbo;
+
+    std::vector<float> spectrum;
+    int recordHead;
+    void setupGL();
+    void audioSetup();
+    void storageSetup();
+    void kinectSetup();
+
+    void drawPointCloud();
+    void updatePointCloud();
 
 };
 

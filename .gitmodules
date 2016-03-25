@@ -1,0 +1,3 @@
+[submodule "src/SimpleTest/Catch"]
+	path = src/SimpleTest/Catch
+	url = https://github.com/philsquared/Catch.git
