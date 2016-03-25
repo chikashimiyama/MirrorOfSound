@@ -1,15 +1,18 @@
 #include "ofApp.h"
-
 using namespace pd;
 
 void ofApp::setupGL()
 {
     ofSetBackgroundColor(0);
-    ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofSetCircleResolution(50);
     ofSetLineWidth(0.1);
     ofEnableAlphaBlending();
+    camera.setNearClip(0.0001);
+    camera.setFarClip(120.0);
+
+    camera.lookAt(ofVec3f(0,0,0));
+    camera.setPosition(0.0, 0.0, 1.0);
 }
 
 void ofApp::audioSetup()
@@ -38,6 +41,13 @@ void ofApp::setup(){
     audioSetup();
     storageSetup();
     kinectSetup();
+    Animation anim([](float x)->float{return x;},
+    15.0,
+    [this](float value){
+       this->scanner.setPosition(0,0,value*4.0-2.0);
+    });
+
+    aManager.addAnimation(anim);
 }
 
 void ofApp::storageSetup(){
@@ -61,8 +71,7 @@ void ofApp::updatePointCloud()
             int vOffset = v * kKinectWidth;
             for(int u = 0; u < kKinectWidth;u++){
                 int uOffset = vOffset + u;
-                pointCloud[uOffset].z = (static_cast<float>(depthPixels[uOffset]) -128.0) / 128.0;
-                if(pointCloud[uOffset].z < -0.9) pointCloud[uOffset].z = -100.0;
+                pointCloud[uOffset].z = (static_cast<float>(depthPixels[uOffset]) -128.0) / -128.0;
             }
         }
     }
@@ -72,8 +81,11 @@ void ofApp::updatePointCloud()
 void ofApp::update(){
 
     kinect.update();
+    aManager.update();
+
     recordHead++;
     recordHead %= kNumTimeSlices; // increment + wrap
+
 
     pd.readArray("spectrum", spectrum);
     updatePointCloud();
@@ -83,11 +95,14 @@ void ofApp::update(){
 
 void ofApp::draw(){
     ofSetColor(ofColor::white);
-    cam.setNearClip(0.0001);
-    cam.begin();
+
+    camera.begin();
     drawPointCloud();
-    cam.end();
+    scanner.draw();
+    camera.end();
+
     eqLineVbo.draw(GL_LINE_STRIP, 0, kNumBins);
+
 }
 
 
@@ -105,10 +120,7 @@ void ofApp::gotMessage(ofMessage msg){
 
 }
 
-//--------------------------------------------------------------
-void ofApp::dragEvent(ofDragInfo dragInfo){
 
-}
 
 void ofApp::exit(){
     kinect.setCameraTiltAngle(0); // zero the tilt on exit

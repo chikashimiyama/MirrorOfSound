@@ -9,7 +9,7 @@ public:
     Interpolation(const std::function<float(float)> &transferFunction);
     float getY(const float &x) const;
 protected:
-    const std::function<float(float)> &transferFunction;
+    const std::function<float(float)> transferFunction;
 };
 
 inline Interpolation::Interpolation(const std::function<float(float)> &transferFunction):
@@ -53,17 +53,21 @@ done(false)
 {}
 
 inline void Animation::update(){
+
     if(done) return;
 
     steady_clock::time_point currentTime = steady_clock::now();
     std::chrono::duration<float> time_span =
             duration_cast<std::chrono::duration<float>>(currentTime - birthTime);
     elapsedTime = time_span.count();
+
     if(elapsedTime > duration){
-        done = true; return;
+        done = true;
+        return;
     }
-    value = transferFunction(getProgress());
-    updateAction(value);
+    float progress = getProgress();
+    value = getY(progress);
+    updateAction(progress);
 }
 
 inline const float &Animation::getDuration()const{
@@ -97,8 +101,9 @@ protected:
 };
 
 inline void AnimationManager::update(){
-    std::for_each(activeAnimationList.begin(), activeAnimationList.end(),
-                  []( Animation & anim){ return anim.update(); });
+    for(Animation & anim : activeAnimationList){
+          anim.update();
+    }
     activeAnimationList.remove_if([](const Animation & anim){ return anim.getDone(); });
 }
 

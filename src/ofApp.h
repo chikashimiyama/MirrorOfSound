@@ -4,6 +4,7 @@
 #include "ofxKinect.h"
 #include "Animation.hpp"
 #include "const.hpp"
+#include "Scanner.h"
 
 class ofApp : public ofBaseApp{
 
@@ -13,7 +14,6 @@ public:
     void draw();
 
     void windowResized(int w, int h);
-    void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     // audio callbacks
     void audioReceived(float * input, int bufferSize, int nChannels);
@@ -21,15 +21,19 @@ public:
     void exit();
 
 protected:
-    ofEasyCam cam;
+    ofCamera camera;
     ofxPd pd;
     ofxKinect kinect;
+    AnimationManager aManager;
+
     std::vector<ofPoint> pointCloud;
     std::vector<ofVec3f> eqLine3D;
 
     //VBO
     ofVbo eqLineVbo;
     ofVbo pointCloudVbo;
+
+    Scanner scanner;
 
     std::vector<float> spectrum;
     int recordHead;
