@@ -8,10 +8,15 @@ public:
 
 
 inline void Scanner::draw(){
-    ofSetColor(ofColor::orange);
+    ofColor orange = ofColor(ofColor::orange);
+    orange.a = 25;
+    ofSetColor(orange);
+
     ofFill();
     ofPushMatrix();
     ofTranslate(getPosition());
-    ofDrawRectangle(-1,1, 2,2);
+    ofDrawRectangle(-1,-1, 2,2);
     ofPopMatrix();
+
+
 }

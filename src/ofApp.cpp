@@ -4,15 +4,18 @@ using namespace pd;
 void ofApp::setupGL()
 {
     ofSetBackgroundColor(0);
+    ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofSetCircleResolution(50);
     ofSetLineWidth(0.1);
     ofEnableAlphaBlending();
     camera.setNearClip(0.0001);
     camera.setFarClip(120.0);
-
-    camera.lookAt(ofVec3f(0,0,0));
-    camera.setPosition(0.0, 0.0, 1.0);
+    camera.setPosition(0.0, 0.0, -1.0);
+    anim.reset( -1.0f );
+    anim.setRepeatType(LOOP_BACK_AND_FORTH);
+    anim.setCurve(EASE_IN_EASE_OUT);
+    anim.animateTo( 1.0f );
 }
 
 void ofApp::audioSetup()
@@ -41,13 +44,8 @@ void ofApp::setup(){
     audioSetup();
     storageSetup();
     kinectSetup();
-    Animation anim([](float x)->float{return x;},
-    15.0,
-    [this](float value){
-       this->scanner.setPosition(0,0,value*4.0-2.0);
-    });
 
-    aManager.addAnimation(anim);
+    gui.setup();
 }
 
 void ofApp::storageSetup(){
@@ -55,7 +53,7 @@ void ofApp::storageSetup(){
     for(int v = 0; v < kKinectHeight; v++){
         for(int u = 0; u < kKinectWidth;u++){
             pointCloud.push_back(ofPoint(static_cast<float>(u)/ kHalfKinectWidth -1.0,
-                                         static_cast<float>(v)/kHalfKinectHeight -1.0, 0.0 ));
+                                         static_cast<float>(v)/-kHalfKinectHeight +1.0, 0.0 ));
         }
     }
 
@@ -81,7 +79,6 @@ void ofApp::updatePointCloud()
 void ofApp::update(){
 
     kinect.update();
-    aManager.update();
 
     recordHead++;
     recordHead %= kNumTimeSlices; // increment + wrap
@@ -91,18 +88,42 @@ void ofApp::update(){
     updatePointCloud();
     eqLineVbo.updateVertexData(&eqLine3D[0], kNumBins);
 
+    anim.update( 1.0f/60.0f );
+
+    ofVec3f scannerPos = scanner.getPosition();
+    scannerPos.z = anim.val();
+    scanner.setPosition(scannerPos);
 }
 
 void ofApp::draw(){
     ofSetColor(ofColor::white);
 
     camera.begin();
+    camera.lookAt(ofVec3f(0,0,0));
+    ofNoFill();
+    ofDrawBox(2,2,2);
     drawPointCloud();
     scanner.draw();
+
+
     camera.end();
 
     eqLineVbo.draw(GL_LINE_STRIP, 0, kNumBins);
+    gui.begin();
+    auto pos = camera.getPosition();
 
+    float x = pos.x;
+    float y = pos.y;
+    float z = pos.z;
+    bool changed = false;
+    if(ImGui::SliderFloat("x", &x, -3.0, 3.0)) changed = true;
+    if(ImGui::SliderFloat("y", &y, -3.0, 3.0)) changed = true;
+    if(ImGui::SliderFloat("z", &z, -5.0, 5.0)) changed = true;
+    if(changed)camera.setPosition(ofVec3f(x,y,z));
+
+
+
+    gui.end();
 }
 
 

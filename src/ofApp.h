@@ -1,8 +1,9 @@
 #pragma once
 #include "ofMain.h"
 #include "ofxPd.h"
+#include "ofxImGui.h"
 #include "ofxKinect.h"
-#include "Animation.hpp"
+#include "ofxAnimatableFloat.h"
 #include "const.hpp"
 #include "Scanner.h"
 
@@ -24,8 +25,8 @@ protected:
     ofCamera camera;
     ofxPd pd;
     ofxKinect kinect;
-    AnimationManager aManager;
-
+    ofxImGui gui;
+    ofxAnimatableFloat anim;
     std::vector<ofPoint> pointCloud;
     std::vector<ofVec3f> eqLine3D;
 
