@@ -22,18 +22,22 @@ public:
     void exit();
 
 protected:
+    int validPixelCount;
+    unsigned char distanceThreshold;
     ofCamera camera;
     ofxPd pd;
     ofxKinect kinect;
     ofxImGui gui;
     ofxAnimatableFloat anim;
+
     std::vector<ofPoint> pointCloud;
-    std::vector<ofVec3f> eqLine3D;
+    std::vector<ofFloatColor> colorCloud;
+    std::vector<ofVec3f> spectrumContour;
 
     //VBO
-    ofVbo eqLineVbo;
-    ofVbo pointCloudVbo;
 
+    ofVbo spectrumContourVbo;
+    ofVbo pointCloudVbo;
     Scanner scanner;
 
     std::vector<float> spectrum;
@@ -43,7 +47,6 @@ protected:
     void storageSetup();
     void kinectSetup();
 
-    void drawPointCloud();
     void updatePointCloud();
 
 };

@@ -1,25 +1,34 @@
 #include "ofApp.h"
 using namespace pd;
 
-void ofApp::setupGL()
-{
+
+
+void ofApp::setupGL(){
     ofSetBackgroundColor(0);
     ofEnableDepthTest();
     ofSetVerticalSync(true);
     ofSetCircleResolution(50);
     ofSetLineWidth(0.1);
     ofEnableAlphaBlending();
+
     camera.setNearClip(0.0001);
     camera.setFarClip(120.0);
-    camera.setPosition(0.0, 0.0, -1.0);
-    anim.reset( -1.0f );
-    anim.setRepeatType(LOOP_BACK_AND_FORTH);
-    anim.setCurve(EASE_IN_EASE_OUT);
-    anim.animateTo( 1.0f );
+    camera.setPosition(0.0, 0.0, -5.0);
+
+    distanceThreshold = 100;
+    for(int i = 0; i < kKinectWidth; i++){
+        spectrumContour.push_back(ofPoint(static_cast<float>(i)/-kHalfKinectWidth +1.0,-1,-1));
+    }
+
+    for(int i = 0; i < kNumKinectPixels; i++){
+        pointCloud.push_back(ofPoint(0,0,0));
+        colorCloud.push_back(ofColor::white);
+    }
+
+    scanner.setPosition(0,0,-1);
 }
 
-void ofApp::audioSetup()
-{
+void ofApp::audioSetup(){
     ofSoundStreamSetup(kNumOutput, kNumInput, this, kSampleRate, ofxPd::blockSize()*8, 3);
     pd.init(kNumOutput, kNumInput, kSampleRate);
     pd.openPatch("spectrum.pd");
@@ -44,55 +53,56 @@ void ofApp::setup(){
     audioSetup();
     storageSetup();
     kinectSetup();
-
     gui.setup();
+
 }
 
 void ofApp::storageSetup(){
-
-    for(int v = 0; v < kKinectHeight; v++){
-        for(int u = 0; u < kKinectWidth;u++){
-            pointCloud.push_back(ofPoint(static_cast<float>(u)/ kHalfKinectWidth -1.0,
-                                         static_cast<float>(v)/-kHalfKinectHeight +1.0, 0.0 ));
-        }
-    }
-
     pointCloudVbo.setVertexData(&pointCloud[0], kNumVertices, GL_DYNAMIC_DRAW);
-    eqLineVbo.setVertexData(&eqLine3D[0], kNumBins, GL_DYNAMIC_DRAW);
+    pointCloudVbo.setColorData(&colorCloud[0], kNumVertices, GL_DYNAMIC_DRAW);
+    spectrumContourVbo.setVertexData(&spectrumContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
 }
 
-void ofApp::updatePointCloud()
-{
-    if(kinect.isFrameNew()){
-        const ofPixels &depthPixels =  kinect.getDepthPixels();
-        for(int v = 0; v < kKinectHeight; v++){
-            int vOffset = v * kKinectWidth;
-            for(int u = 0; u < kKinectWidth;u++){
-                int uOffset = vOffset + u;
-                pointCloud[uOffset].z = (static_cast<float>(depthPixels[uOffset]) -128.0) / -128.0;
-            }
+void ofApp::updatePointCloud(){
+    if(kinect.isFrameNewDepth()){
+        std::for_each(spectrumContour.begin(), spectrumContour.end(), [](ofPoint & point){
+            point.y = -1.0;
+        });
+        validPixelCount = 0;
+        const ofPixels &pixels = kinect.getDepthPixels();
+        for(int i = 0; i < kNumKinectPixels; i++){
+            const unsigned char distance = pixels[i];
+            if( distance > distanceThreshold){
+                // valid
+                float y = static_cast<float>(i / kKinectWidth);
+                float x = static_cast<float>(i % kKinectWidth);
+                pointCloud[validPixelCount].x = (x - kHalfKinectWidthFloat) / -kHalfKinectWidth;
+                pointCloud[validPixelCount].y = (y -kHalfKinectHeightFloat) / -kHalfKinectHeightFloat;
+                float z = (static_cast<float>(distance) - 128.0) / -64.0;
+                pointCloud[validPixelCount].z = z;
+                if(z < -1.0){
+                    colorCloud[validPixelCount] = ofColor::orange;
+                    float max = spectrumContour[x].y;
+                    if(max < y){
+                        spectrumContour[x].y = pointCloud[validPixelCount].y;
+                    }
+                }else{
+                    colorCloud[validPixelCount] = ofColor::white;
+                }
+
+                validPixelCount++;
+           }
         }
     }
-    pointCloudVbo.updateVertexData(&pointCloud[0], kNumVertices);
+    pointCloudVbo.updateColorData(&colorCloud[0], validPixelCount);
+    pointCloudVbo.updateVertexData(&pointCloud[0], validPixelCount);
+    spectrumContourVbo.updateVertexData(&spectrumContour[0], kKinectWidth);
 }
 
 void ofApp::update(){
-
     kinect.update();
-
-    recordHead++;
-    recordHead %= kNumTimeSlices; // increment + wrap
-
-
-    pd.readArray("spectrum", spectrum);
     updatePointCloud();
-    eqLineVbo.updateVertexData(&eqLine3D[0], kNumBins);
-
-    anim.update( 1.0f/60.0f );
-
-    ofVec3f scannerPos = scanner.getPosition();
-    scannerPos.z = anim.val();
-    scanner.setPosition(scannerPos);
+    pd.readArray("spectrum", spectrum);
 }
 
 void ofApp::draw(){
@@ -102,46 +112,39 @@ void ofApp::draw(){
     camera.lookAt(ofVec3f(0,0,0));
     ofNoFill();
     ofDrawBox(2,2,2);
-    drawPointCloud();
-    scanner.draw();
+    pointCloudVbo.draw(GL_POINTS, 0, validPixelCount);
+    ofSetColor(ofColor::red);
+    spectrumContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
+    scanner.draw();
 
     camera.end();
 
-    eqLineVbo.draw(GL_LINE_STRIP, 0, kNumBins);
     gui.begin();
     auto pos = camera.getPosition();
 
     float x = pos.x;
     float y = pos.y;
     float z = pos.z;
+    int thresh = distanceThreshold;
+    if(ImGui::SliderInt("distThresh", &thresh, 0, 255)){
+        distanceThreshold = thresh;
+    }
+
     bool changed = false;
     if(ImGui::SliderFloat("x", &x, -3.0, 3.0)) changed = true;
     if(ImGui::SliderFloat("y", &y, -3.0, 3.0)) changed = true;
     if(ImGui::SliderFloat("z", &z, -5.0, 5.0)) changed = true;
     if(changed)camera.setPosition(ofVec3f(x,y,z));
-
-
-
+    ImGui::Text(ofToString(validPixelCount).c_str());
     gui.end();
 }
 
-
-void ofApp::drawPointCloud(){
-    pointCloudVbo.draw(GL_POINTS, 0, kNumKinectPixels);
-}
-
-//--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
-
 }
 
-//--------------------------------------------------------------
 void ofApp::gotMessage(ofMessage msg){
-
 }
-
-
 
 void ofApp::exit(){
     kinect.setCameraTiltAngle(0); // zero the tilt on exit
@@ -152,7 +155,6 @@ void ofApp::audioReceived(float * input, int bufferSize, int nChannels) {
    pd.audioIn(input, bufferSize, nChannels);
 }
 
-//--------------------------------------------------------------
 void ofApp::audioRequested(float * output, int bufferSize, int nChannels) {
     pd.audioOut(output, bufferSize, nChannels);
 }

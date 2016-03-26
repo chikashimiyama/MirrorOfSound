@@ -8,9 +8,9 @@ public:
 
 
 inline void Scanner::draw(){
-    ofColor orange = ofColor(ofColor::orange);
-    orange.a = 25;
-    ofSetColor(orange);
+    ofColor green = ofColor(ofColor::green);
+    green.a = 50;
+    ofSetColor(green);
 
     ofFill();
     ofPushMatrix();
