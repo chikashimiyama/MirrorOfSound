@@ -1,8 +1,7 @@
 #include "ofApp.h"
 using namespace pd;
 
-void ofApp::setupGLEnvironment()
-{
+void ofApp::setupGLEnvironment(){
     ofSetBackgroundColor(0);
     ofEnableDepthTest();
     ofSetVerticalSync(true);
@@ -11,18 +10,16 @@ void ofApp::setupGLEnvironment()
     ofEnableAlphaBlending();
 }
 
-void ofApp::setupGLCamera()
-{
+void ofApp::setupGLCamera(){
     camera.setNearClip(0.0001);
     camera.setFarClip(120.0);
     camera.setPosition(0.0, 0.0, -5.0);
 }
 
-
-void ofApp::setupGLGainContour()
-{
+void ofApp::setupGLGainContour(){
+    gainContour.reserve(kKinectWidth);
     for(int i = 0; i < kKinectWidth ;i++){
-        gainContour.push_back(ofPoint( static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1,-1));
+        gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1,-1);
     }
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
 }
@@ -30,27 +27,26 @@ void ofApp::setupGLGainContour()
 void ofApp::setupPointCloud(){
     pointCloudVertices = std::vector<ofPoint>(kNumKinectPixels, ofPoint(0,0,0));
     pointCloudColors = std::vector<ofFloatColor>(kNumKinectPixels, ofColor::white);
-
-    pointCloudVbo.setVertexData(&pointCloudVertices[0], kNumVertices, GL_DYNAMIC_DRAW);
+    pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumVertices, GL_DYNAMIC_DRAW);
     pointCloudVbo.setColorData(&pointCloudColors[0], kNumVertices, GL_DYNAMIC_DRAW);
 }
 
 void ofApp::setupSpectrograms(){
-    for(int i = 0; i < kHalfNumTimeSlices; i++){
+    afterSpectrogram.reserve(kNumTimeSlices * kNumBins);
+    for(int i = 0; i < kNumTimeSlices; i++){
         for(int j = 0; j < kNumBins; j++){
             float x = static_cast<float>(j) / static_cast<float>(kNumBins) * 2.0 - 1.0;
-            beforeSpectrogram.push_back(ofPoint(x,-1.0,-1.0));
-            afterSpectrogram.push_back(ofPoint(x,-1.0,-1.0));
-
+            afterSpectrogram.emplace_back(x,-1.0,-1.0);
         }
     }
-    beforeSpectrogramVbo.setVertexData(&beforeSpectrogram[0],kHalfNumVertices ,GL_DYNAMIC_DRAW);
-    afterSpectrogramVbo.setVertexData(&afterSpectrogram[0],kHalfNumVertices ,GL_DYNAMIC_DRAW);
+    afterSpectrogramVbo.setVertexData(&afterSpectrogram[0],kNumVertices ,GL_DYNAMIC_DRAW);
 }
 
-void ofApp::setupGLBuffer()
-{
+void ofApp::setupGLBuffer(){
     distanceThreshold = 100;
+    sliceDist = 0.1;
+    timeSpread = 0.5;
+
     setupGLGainContour();
     setupPointCloud();
     setupSpectrograms();
@@ -58,8 +54,7 @@ void ofApp::setupGLBuffer()
     boxEnabled = false;
 }
 
-void ofApp::setupObject()
-{
+void ofApp::setupObject(){
     scanner.setPosition(0,0,-1);
 }
 
@@ -94,12 +89,10 @@ void ofApp::kinectSetup(){
 }
 
 void ofApp::setup(){
-
     setupGL();
     audioSetup();
     kinectSetup();
     gui.setup();
-
 }
 
 // update
@@ -113,7 +106,6 @@ void ofApp::updatePointCloud(){
         for(int i = 0; i < kNumKinectPixels; i++){
             const unsigned char distance = pixels[i];
             if( distance > distanceThreshold){
-                // valid
                 float y = static_cast<float>(i / kKinectWidth);
                 float x = static_cast<float>(i % kKinectWidth);
                 pointCloudVertices[validPixelCount].x = (x - kHalfKinectWidthFloat) / kHalfKinectWidth;
@@ -130,16 +122,14 @@ void ofApp::updatePointCloud(){
                 }else{
                     pointCloudColors[validPixelCount] = ofColor::gray;
                 }
-
                 validPixelCount++;
            }
         }
     }
+
     pointCloudVbo.updateColorData(&pointCloudColors[0], validPixelCount);
     pointCloudVbo.updateVertexData(&pointCloudVertices[0], validPixelCount);
     gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
-    beforeSpectrogramVbo.updateVertexData(&beforeSpectrogram[0], kHalfNumVertices );
-    afterSpectrogramVbo.updateVertexData(&afterSpectrogram[0], kHalfNumVertices );
 
 }
 
@@ -162,38 +152,34 @@ void ofApp::updateSpectrogram()
             pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
         afterSpectrogram[pixelOffset+i].y = pdSpectrumBuffer[i] - 1.0;
-
-        if(pdGainBuffer[i] > 1.0) pdGainBuffer[i] = 1.0;
-        if(pdGainBuffer[i] < 0.0) pdGainBuffer[i] = 0.0;
-
     }
+    afterSpectrogramVbo.updateVertexData(&afterSpectrogram[0], kNumVertices );
 }
 
 void ofApp::update(){
-    kinect.update();
-    updatePointCloud();
-    pd.writeArray("gain", pdGainBuffer);
+    // read audio data and visualize
     pd.readArray("spectrum", pdSpectrumBuffer);
     updateSpectrogram();
 
-    recordHead++;
-    recordHead %= kHalfNumTimeSlices;
+    // read kinect data and sonificate
+    kinect.update();
+    updatePointCloud();
+    pd.writeArray("gain", pdGainBuffer);
 
+    recordHead++;
+    recordHead %= kNumTimeSlices;
 }
 
 void ofApp::drawSpectrogram(){
-
-
-    float sliceDist = 0.1;
-    float maxDist = sliceDist * kHalfNumTimeSlices;
-    int oneMinusRecHead = recordHead-1;
-    if(oneMinusRecHead < 0) oneMinusRecHead += kHalfNumTimeSlices;
-
+    float maxDist = sliceDist * kNumTimeSlices;
     ofSetColor(ofColor(125,125,255, 150));
-    for(int i = 0; i < kHalfNumTimeSlices;i++){
-        int offset = (oneMinusRecHead + i) % kHalfNumTimeSlices * kNumBins;
+    for(int i = 0; i < kNumTimeSlices;i++){
+        int offset = (recordHead + i) % kNumTimeSlices * kNumBins;
+        float distance = sliceDist * -i + maxDist;
         ofPushMatrix();
-        glTranslatef(0,0, sliceDist * -i + maxDist);
+        glTranslatef(0,0,distance );
+        float scale = 1 + distance * timeSpread;
+        glScalef(scale, 1, 1);
         afterSpectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();
     }
@@ -209,13 +195,10 @@ void ofApp::drawWorld(){
         ofDrawBox(2,2,2);
     }
 
-
     pointCloudVbo.draw(GL_POINTS, 0, validPixelCount);
-
 
     ofSetColor(ofColor(255,255,255,125));
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
-
 
     drawSpectrogram();
     scanner.draw();
@@ -237,7 +220,11 @@ void ofApp::drawGui(){
     bool changed = false;
     if(ImGui::SliderFloat("x", &x, -3.0, 3.0)) changed = true;
     if(ImGui::SliderFloat("y", &y, -3.0, 3.0)) changed = true;
-    if(ImGui::SliderFloat("z", &z, -5.0, 5.0)) changed = true;
+    if(ImGui::SliderFloat("z", &z, -15.0, 5.0)) changed = true;
+
+    ImGui::SliderFloat("slice dist", &sliceDist, 0.0, 1.0);
+    ImGui::SliderFloat("time spread", &timeSpread, 0.0, 5.0);
+
     if(changed)camera.setPosition(ofVec3f(x,y,z));
     ImGui::Text(ofToString(validPixelCount).c_str());
     gui.end();

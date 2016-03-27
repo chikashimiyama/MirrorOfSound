@@ -14,6 +14,7 @@ inline void Scanner::draw(){
 
     ofFill();
     ofPushMatrix();
+
     ofTranslate(getPosition());
     ofDrawRectangle(-1,-1, 2,2);
     ofPopMatrix();

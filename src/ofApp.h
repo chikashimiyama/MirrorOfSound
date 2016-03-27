@@ -32,6 +32,9 @@ protected:
 
     int validPixelCount;
     unsigned char distanceThreshold;
+    float sliceDist;
+    float timeSpread;
+
     ofCamera camera;
     ofxPd pd;
     ofxKinect kinect;
@@ -46,21 +49,16 @@ protected:
     std::vector<ofPoint> gainContour;
     ofVbo gainContourVbo;
 
-
     //3D spectrogram based on Pd
     std::vector<float> pdSpectrumBuffer;
     std::vector<float> pdGainBuffer;
+    std::vector<float> pdMaterialBuffer;
 
-    std::vector<ofPoint> beforeSpectrogram;
-    ofVbo beforeSpectrogramVbo;
 
     std::vector<ofPoint> afterSpectrogram;
     ofVbo afterSpectrogramVbo;
 
-
-
     //VBO
-
     Scanner scanner;
 
     int recordHead;
