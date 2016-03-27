@@ -10,6 +10,7 @@
 class ofApp : public ofBaseApp{
 
 public:
+
     void setup();
     void update();
     void draw();
@@ -17,11 +18,18 @@ public:
     void windowResized(int w, int h);
     void gotMessage(ofMessage msg);
     // audio callbacks
+
     void audioReceived(float * input, int bufferSize, int nChannels);
     void audioRequested(float * output, int bufferSize, int nChannels);
     void exit();
 
+    void keyPressed(int key);
+    void setupGLGainContour();
+
 protected:
+    bool guiEnabled;
+    bool boxEnabled;
+
     int validPixelCount;
     unsigned char distanceThreshold;
     ofCamera camera;
@@ -30,17 +38,31 @@ protected:
     ofxImGui gui;
     ofxAnimatableFloat anim;
 
-    std::vector<ofPoint> pointCloud;
-    std::vector<ofFloatColor> colorCloud;
-    std::vector<ofVec3f> spectrumContour;
+    //kinect
+    std::vector<ofPoint> pointCloudVertices;
+    std::vector<ofFloatColor> pointCloudColors;
+    ofVbo pointCloudVbo;
+
+    std::vector<ofPoint> gainContour;
+    ofVbo gainContourVbo;
+
+
+    //3D spectrogram based on Pd
+    std::vector<float> pdSpectrumBuffer;
+    std::vector<float> pdGainBuffer;
+
+    std::vector<ofPoint> beforeSpectrogram;
+    ofVbo beforeSpectrogramVbo;
+
+    std::vector<ofPoint> afterSpectrogram;
+    ofVbo afterSpectrogramVbo;
+
+
 
     //VBO
 
-    ofVbo spectrumContourVbo;
-    ofVbo pointCloudVbo;
     Scanner scanner;
 
-    std::vector<float> spectrum;
     int recordHead;
     void setupGL();
     void audioSetup();
@@ -49,5 +71,15 @@ protected:
 
     void updatePointCloud();
 
+    void setupGLEnvironment();
+    void setupGLCamera();
+    void setupGLBuffer();
+    void setupObject();
+    void drawWorld();
+    void drawGui();
+    void drawSpectrogram();
+    void updateSpectrogram();
+    void setupPointCloud();
+    void setupSpectrograms();
 };
 
