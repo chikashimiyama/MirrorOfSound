@@ -5,6 +5,7 @@
 #include "ofxKinect.h"
 #include "ofxAnimatableFloat.h"
 #include "ofxAnimatableOfPoint.h"
+#include "PointCloud.hpp"
 #include "Spectrogram.hpp"
 #include "const.hpp"
 #include "Scanner.h"
@@ -28,6 +29,8 @@ public:
     void keyPressed(int key);
     void setupGLGainContour();
 
+    void gainContourFromPd();
+
 protected:
     bool guiEnabled;
     bool boxEnabled;
@@ -39,18 +42,13 @@ protected:
 
     ofCamera camera;
     ofxPd pd;
-    ofxKinect kinect;
     ofxImGui gui;
     ofxAnimatableFloat anim;
-
-    //kinect
-    std::vector<ofPoint> pointCloudVertices;
-    std::vector<ofFloatColor> pointCloudColors;
-
-    ofVbo pointCloudVbo;
+    ofxKinect kinect;
 
     std::vector<ofPoint> gainContour;
     ofVbo gainContourVbo;
+    PointCloud pointCloud;
 
     //3D spectrogram based on Pd
     std::vector<float> pdSpectrumBuffer;
@@ -69,7 +67,6 @@ protected:
     void storageSetup();
     void kinectSetup();
 
-    void updatePointCloud();
 
     void setupGLEnvironment();
     void setupGLCamera();
@@ -77,6 +74,6 @@ protected:
     void setupObject();
     void drawWorld();
     void drawGui();
-    void setupPointCloud();
+    void updateGainContour();
 };
 

@@ -1,5 +1,10 @@
-#ifndef CAMERAWORKS
-#define CAMERAWORKS
+#pragma once
 
-#endif // CAMERAWORKS
+#include "ofMain.h"
 
+class CameraWork {
+public:
+    startInsert(const double &duration);
+
+
+};

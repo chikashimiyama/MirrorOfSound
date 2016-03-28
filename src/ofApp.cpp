@@ -16,34 +16,21 @@ void ofApp::setupGLCamera(){
     camera.setPosition(0.0, 0.0, -5.0);
 }
 
-void ofApp::setupGLGainContour(){
-    gainContour.reserve(kKinectWidth);
-    for(int i = 0; i < kKinectWidth ;i++){
-        gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
-    }
-    gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
-}
-
-void ofApp::setupPointCloud(){
-    pointCloudVertices = std::vector<ofPoint>(kNumKinectPixels, ofPoint(0,0,0));
-    pointCloudColors = std::vector<ofFloatColor>(kNumKinectPixels, ofColor::white);
-
-    pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumVertices, GL_DYNAMIC_DRAW);
-    pointCloudVbo.setColorData(&pointCloudColors[0], kNumVertices, GL_DYNAMIC_DRAW);
-}
-
-
-
 void ofApp::setupGLBuffer(){
     distanceThreshold = 100;
     sliceDist = 0.1;
     timeSpread = 0.5;
 
-    setupGLGainContour();
-    setupPointCloud();
+    pointCloud.setup();
     spectrogram.setup();
     guiEnabled = false;
     boxEnabled = false;
+
+    gainContour.reserve(kKinectWidth);
+    for(int i = 0; i < kKinectWidth ;i++){
+        gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
+    }
+    gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
 }
 
 void ofApp::setupObject(){
@@ -85,6 +72,7 @@ void ofApp::audioSetup(){
     pd.start();
 }
 
+
 void ofApp::kinectSetup(){
     kinect.init();
     kinect.open();if(kinect.isConnected()) {
@@ -99,59 +87,19 @@ void ofApp::kinectSetup(){
 }
 
 void ofApp::setup(){
+    kinectSetup();
     setupGL();
     audioSetup();
     kinectSetup();
+    pointCloud.setup();
     gui.setup();
 }
 
 // update
-void ofApp::updatePointCloud(){
-    if(kinect.isFrameNewDepth()){
-        std::for_each(gainContour.begin(), gainContour.end(), [](ofPoint & point){
-            point.y = -1.0;
-        });
-        validPixelCount = 0;
-        const ofPixels &pixels = kinect.getDepthPixels();
-        for(int i = 0; i < kNumKinectPixels; i++){
-            const unsigned char distance = pixels[i];
-            if( distance > distanceThreshold){
-                float y = static_cast<float>(i / kKinectWidth);
-                float x = static_cast<float>(i % kKinectWidth);
-                pointCloudVertices[validPixelCount].x = (x - kHalfKinectWidthFloat) / kHalfKinectWidth;
-                pointCloudVertices[validPixelCount].y = (y -kHalfKinectHeightFloat) / -kHalfKinectHeightFloat;
-                float z = (static_cast<float>(distance) - 128.0) / -64.0 + 1.0;
-                pointCloudVertices[validPixelCount].z = z;
-                if(z < 0.0){ // enter negative side
-                    pointCloudColors[validPixelCount] = ofColor::white;
-                    float max = gainContour[x].y;
-                    if(max < y){
-                        gainContour[x].y = pointCloudVertices[validPixelCount].y;
 
-                    }
-                }else{
-                    pointCloudColors[validPixelCount] = ofColor::gray;
-                }
-                validPixelCount++;
-           }
-        }
-    }
 
-    pointCloudVbo.updateColorData(&pointCloudColors[0], validPixelCount);
-    pointCloudVbo.updateVertexData(&pointCloudVertices[0], validPixelCount);
-    gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
-
-}
-
-void ofApp::update(){
-    scaleAnimation.update(1/30.0);
-    lightAnimation.update(1/30.0);
-
-    pointLight.setPosition(lightAnimation.getCurrentPosition());
-    timeSpread = scaleAnimation.val();
-    // read audio data and visualize
-    pd.readArray("spectrum", pdSpectrumBuffer);
-
+void ofApp::updateGainContour()
+{
     for(int i = 0; i < kNumBins;i++){
         float findex = static_cast<float>(i) * widthToBinRatio;
         float floor = std::floor(findex);
@@ -166,12 +114,33 @@ void ofApp::update(){
             pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
     }
+}
+
+void ofApp::update(){
+    scaleAnimation.update(1/30.0);
+    lightAnimation.update(1/30.0);
+
+    pointLight.setPosition(lightAnimation.getCurrentPosition());
+    timeSpread = scaleAnimation.val();
+
+    // read spectrum
+
+
+    pd.readArray("spectrum", pdSpectrumBuffer);
     spectrogram.update(pdSpectrumBuffer);
 
     // read kinect data and sonificate
     kinect.update();
-    updatePointCloud();
+    if(kinect.isFrameNewDepth()){
+        std::for_each(gainContour.begin(), gainContour.end(), [](ofPoint & point){
+            point.y = -1.0;
+        });
+
+        pointCloud.update(kinect.getDepthPixels(),gainContour,distanceThreshold);
+    }
+    updateGainContour();
     pd.writeArray("gain", pdGainBuffer);
+    gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
 
 }
 
@@ -185,8 +154,7 @@ void ofApp::drawWorld(){
         ofDrawBox(2,2,2);
     }
 
-    pointCloudVbo.draw(GL_POINTS, 0, validPixelCount);
-
+    pointCloud.draw();
     ofSetColor(ofColor(255,255,255,125));
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
@@ -226,7 +194,7 @@ void ofApp::drawGui(){
     ImGui::SliderFloat("time spread", &timeSpread, 0.0, 5.0);
 
     if(changed)camera.setPosition(ofVec3f(x,y,z));
-    ImGui::Text(ofToString(validPixelCount).c_str());
+   // ImGui::Text(ofToString(validPixelCount).c_str());
     gui.end();
 }
 

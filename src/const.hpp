@@ -19,8 +19,11 @@ const int kNumKinectPixels = kKinectHeight * kKinectWidth;
 const int kNumTimeSlices = 256;
 const int kNumBins = 1024;
 const int kHalfNumBins = kNumBins / 2;
-const int kHalfNumTimeSlices = kNumTimeSlices / 2;
 const int kNumVertices = kNumBins * kNumTimeSlices;
+const int kHalfNumVertices = kNumVertices /2;
 const int kSampleRate = 44100;
 const int kNumInput = 0;
 const int kNumOutput = 2;
+
+const float widthToBinRatio = static_cast<float>(kKinectWidth) / static_cast<float>(kNumBins);
+const float binToWidhRatio = static_cast<float>(kNumBins) / static_cast<float>(kKinectWidth);
