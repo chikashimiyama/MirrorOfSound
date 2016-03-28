@@ -4,6 +4,8 @@
 #include "ofxImGui.h"
 #include "ofxKinect.h"
 #include "ofxAnimatableFloat.h"
+#include "ofxAnimatableOfPoint.h"
+#include "Spectrogram.hpp"
 #include "const.hpp"
 #include "Scanner.h"
 
@@ -44,6 +46,7 @@ protected:
     //kinect
     std::vector<ofPoint> pointCloudVertices;
     std::vector<ofFloatColor> pointCloudColors;
+
     ofVbo pointCloudVbo;
 
     std::vector<ofPoint> gainContour;
@@ -54,14 +57,13 @@ protected:
     std::vector<float> pdGainBuffer;
     std::vector<float> pdMaterialBuffer;
 
+    ofLight pointLight;
+    ofxAnimatableFloat scaleAnimation;
+    ofxAnimatableOfPoint lightAnimation;
 
-    std::vector<ofPoint> afterSpectrogram;
-    ofVbo afterSpectrogramVbo;
-
-    //VBO
     Scanner scanner;
+    Spectrogram spectrogram;
 
-    int recordHead;
     void setupGL();
     void audioSetup();
     void storageSetup();
@@ -75,9 +77,6 @@ protected:
     void setupObject();
     void drawWorld();
     void drawGui();
-    void drawSpectrogram();
-    void updateSpectrogram();
     void setupPointCloud();
-    void setupSpectrograms();
 };
 

@@ -12,14 +12,14 @@ void ofApp::setupGLEnvironment(){
 
 void ofApp::setupGLCamera(){
     camera.setNearClip(0.0001);
-    camera.setFarClip(120.0);
+    camera.setFarClip(1000.0);
     camera.setPosition(0.0, 0.0, -5.0);
 }
 
 void ofApp::setupGLGainContour(){
     gainContour.reserve(kKinectWidth);
     for(int i = 0; i < kKinectWidth ;i++){
-        gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1,-1);
+        gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
     }
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
 }
@@ -27,20 +27,12 @@ void ofApp::setupGLGainContour(){
 void ofApp::setupPointCloud(){
     pointCloudVertices = std::vector<ofPoint>(kNumKinectPixels, ofPoint(0,0,0));
     pointCloudColors = std::vector<ofFloatColor>(kNumKinectPixels, ofColor::white);
+
     pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumVertices, GL_DYNAMIC_DRAW);
     pointCloudVbo.setColorData(&pointCloudColors[0], kNumVertices, GL_DYNAMIC_DRAW);
 }
 
-void ofApp::setupSpectrograms(){
-    afterSpectrogram.reserve(kNumTimeSlices * kNumBins);
-    for(int i = 0; i < kNumTimeSlices; i++){
-        for(int j = 0; j < kNumBins; j++){
-            float x = static_cast<float>(j) / static_cast<float>(kNumBins) * 2.0 - 1.0;
-            afterSpectrogram.emplace_back(x,-1.0,-1.0);
-        }
-    }
-    afterSpectrogramVbo.setVertexData(&afterSpectrogram[0],kNumVertices ,GL_DYNAMIC_DRAW);
-}
+
 
 void ofApp::setupGLBuffer(){
     distanceThreshold = 100;
@@ -49,13 +41,31 @@ void ofApp::setupGLBuffer(){
 
     setupGLGainContour();
     setupPointCloud();
-    setupSpectrograms();
+    spectrogram.setup();
     guiEnabled = false;
     boxEnabled = false;
 }
 
 void ofApp::setupObject(){
-    scanner.setPosition(0,0,-1);
+    scanner.setPosition(0,0,0);
+    scaleAnimation.reset(0.2);
+    scaleAnimation.setCurve(EASE_IN);
+    scaleAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
+    scaleAnimation.setDuration(15);
+    scaleAnimation.animateTo( 2.8 );
+
+
+    lightAnimation.setPosition(ofPoint(0.0, 35.0, 25.0));
+    lightAnimation.setCurve(EASE_IN_EASE_OUT);
+    lightAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
+    lightAnimation.setDuration(10);
+    lightAnimation.animateTo(ofPoint(0.0, 35.0, 150.0));
+
+    pointLight.setSpotlight();
+    pointLight.setAttenuation(1.5,0.,0.);
+    pointLight.setDiffuseColor(ofColor::lightGray);
+    pointLight.setSpecularColor(ofColor::silver);
+
 }
 
 void ofApp::setupGL(){
@@ -110,9 +120,9 @@ void ofApp::updatePointCloud(){
                 float x = static_cast<float>(i % kKinectWidth);
                 pointCloudVertices[validPixelCount].x = (x - kHalfKinectWidthFloat) / kHalfKinectWidth;
                 pointCloudVertices[validPixelCount].y = (y -kHalfKinectHeightFloat) / -kHalfKinectHeightFloat;
-                float z = (static_cast<float>(distance) - 128.0) / -64.0;
+                float z = (static_cast<float>(distance) - 128.0) / -64.0 + 1.0;
                 pointCloudVertices[validPixelCount].z = z;
-                if(z < -1.0){
+                if(z < 0.0){ // enter negative side
                     pointCloudColors[validPixelCount] = ofColor::white;
                     float max = gainContour[x].y;
                     if(max < y){
@@ -133,16 +143,20 @@ void ofApp::updatePointCloud(){
 
 }
 
-void ofApp::updateSpectrogram()
-{
-    int pixelOffset = recordHead * kNumBins;
+void ofApp::update(){
+    scaleAnimation.update(1/30.0);
+    lightAnimation.update(1/30.0);
 
-    for(int i = 0; i < kNumBins ;i++){
+    pointLight.setPosition(lightAnimation.getCurrentPosition());
+    timeSpread = scaleAnimation.val();
+    // read audio data and visualize
+    pd.readArray("spectrum", pdSpectrumBuffer);
+
+    for(int i = 0; i < kNumBins;i++){
         float findex = static_cast<float>(i) * widthToBinRatio;
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);
-
         if(index >= kKinectWidth-1){
             pdGainBuffer[i] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
         }else{
@@ -151,38 +165,14 @@ void ofApp::updateSpectrogram()
             float gainVal = (gainRight-gainLeft) * weight + gainLeft;
             pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
-        afterSpectrogram[pixelOffset+i].y = pdSpectrumBuffer[i] - 1.0;
     }
-    afterSpectrogramVbo.updateVertexData(&afterSpectrogram[0], kNumVertices );
-}
-
-void ofApp::update(){
-    // read audio data and visualize
-    pd.readArray("spectrum", pdSpectrumBuffer);
-    updateSpectrogram();
+    spectrogram.update(pdSpectrumBuffer);
 
     // read kinect data and sonificate
     kinect.update();
     updatePointCloud();
     pd.writeArray("gain", pdGainBuffer);
 
-    recordHead++;
-    recordHead %= kNumTimeSlices;
-}
-
-void ofApp::drawSpectrogram(){
-    float maxDist = sliceDist * kNumTimeSlices;
-    ofSetColor(ofColor(125,125,255, 150));
-    for(int i = 0; i < kNumTimeSlices;i++){
-        int offset = (recordHead + i) % kNumTimeSlices * kNumBins;
-        float distance = sliceDist * -i + maxDist;
-        ofPushMatrix();
-        glTranslatef(0,0,distance );
-        float scale = 1 + distance * timeSpread;
-        glScalef(scale, 1, 1);
-        afterSpectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
-        ofPopMatrix();
-    }
 }
 
 void ofApp::drawWorld(){
@@ -200,7 +190,17 @@ void ofApp::drawWorld(){
     ofSetColor(ofColor(255,255,255,125));
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
-    drawSpectrogram();
+    ofEnableLighting();
+    pointLight.enable();
+    spectrogram.draw(sliceDist, timeSpread);
+    pointLight.disable();
+
+    ofDisableLighting();
+
+    ofPushMatrix();
+    ofTranslate(lightAnimation.getCurrentPosition());
+    ofDrawSphere(1);
+    ofPopMatrix();
     scanner.draw();
     camera.end();
 }

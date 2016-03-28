@@ -1,0 +1,5 @@
+#ifndef CAMERAWORKS
+#define CAMERAWORKS
+
+#endif // CAMERAWORKS
+
