@@ -23,9 +23,9 @@ protected:
 inline void Spectrogram::setup(bool reverse){
     this->reverse = std::move(reverse);
     spectrogramMaterial.setDiffuseColor(ofColor::white);
-    spectrogramMaterial.setSpecularColor(ofColor::lightBlue);
-    spectrogramMaterial.setAmbientColor(ofColor::white);
-    spectrogramMaterial.setShininess(30);
+    spectrogramMaterial.setSpecularColor(ofColor::white);
+    spectrogramMaterial.setAmbientColor(ofColor::lightBlue);
+    spectrogramMaterial.setShininess(40);
 
     spectrogramVertices.reserve(kNumVertices);
     spectrogramNormals = std::vector<ofPoint>(kNumVertices, ofPoint(0,1,0));

@@ -22,23 +22,23 @@ void ofApp::setupGLCamera(){
     insertionCamera.storePosition("Hand", ofPoint(5,2,0.5));
     insertionCamera.storePosition("FarBack", ofPoint(5,5,150));
     insertionCamera.storePosition("Above", ofPoint(-1,50,1));
-    insertionCamera.storePosition("GroundFar", ofPoint(0,0, -10));
-    insertionCamera.storePosition("Below", ofPoint(1,-10,-10));
-    insertionCamera.storePosition("Distant", ofPoint(-25,-15,-50));
-    insertionCamera.storePosition("Fish", ofPoint(100,-5,-10));
+    insertionCamera.storePosition("GroundFar", ofPoint(0,0, 10));
+    insertionCamera.storePosition("Below", ofPoint(1,-10,10));
+    insertionCamera.storePosition("Distant", ofPoint(-25,-15,50));
+    insertionCamera.storePosition("Fish", ofPoint(100,-5,10));
     insertionCamera.storePosition("Center", ofPoint(10,10,10));
-    insertionCamera.storePosition("Subjective", ofPoint(1,2,-5));
+    insertionCamera.storePosition("Subjective", ofPoint(1,2,5));
     insertionCamera.setHysteresis(5000);
 
-    lightDrones[0].storePosition("FarAbove", ofPoint(0.0, 52.0, -100.0));
-    lightDrones[0].storePosition("NearAbove", ofPoint(0.0, 52.0, 100.0));
+    lightDrones[0].storePosition("FarAbove", ofPoint(0.0, 52.0, -30.0));
+    lightDrones[0].storePosition("NearAbove", ofPoint(0.0, 52.0, 30.0));
     lightDrones[0].startMovement("FarAbove", "NearAbove", 30);
 
-    lightDrones[1].storePosition("FarAbove", ofPoint(100.0, 52.0, -100.0));
-    lightDrones[1].storePosition("NearAbove", ofPoint(-100.0, 52.0, 100.0));
+    lightDrones[1].storePosition("FarAbove", ofPoint(30.0, 82.0, 0.0));
+    lightDrones[1].storePosition("NearAbove", ofPoint(-30.0, 82.0, 00.0));
     lightDrones[1].startMovement("FarAbove", "NearAbove", 20);
 
-    lightDrones[2].storePosition("FarAbove", ofPoint(0.0, -100.0, 0.0));
+    lightDrones[2].storePosition("FarAbove", ofPoint(0.0, 0.0, 0.0));
     lightDrones[2].storePosition("NearAbove", ofPoint(0.0, 100.0, 0.0));
     lightDrones[2].startMovement("FarAbove", "NearAbove", 50);
 
@@ -216,7 +216,6 @@ void ofApp::drawWorld(){
     ofRotateY(180);
     futureSpectrogram.draw(sliceDist, timeSpread);
     ofPopMatrix();
-
     scanner.draw();
     //for(auto &lightDrone: lightDrones){lightDrone.draw();}
 

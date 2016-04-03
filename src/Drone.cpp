@@ -18,11 +18,11 @@ LightDrone::LightDrone(){
     setSpotlight();
     setOrientation(ofVec3f(0,-1,0));
     //setSpotlightCutOff(ofGetMouseX());
-    setAttenuation(1, 0.1, 0.01);
+    setAttenuation(0.8, 0.1, 0);
     lookAt(ofPoint(0,-1,0));
     setAmbientColor(ofColor::gray);
     setDiffuseColor(ofColor::lightGray);
-    setSpecularColor(ofColor::silver);
+    setSpecularColor(ofColor::white);
 }
 
 LightDrone::~LightDrone(){}
