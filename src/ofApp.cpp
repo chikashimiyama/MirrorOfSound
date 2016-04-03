@@ -1,6 +1,8 @@
 #include "ofApp.h"
 using namespace pd;
 
+const std::vector<std::string> ofApp::positionNames = {"Hand", "FarBack","Above","GroundFar","Below","Distant","Fish","Center", "Subjective"};
+
 void ofApp::setupGLEnvironment(){
     ofSetBackgroundColor(0);
     ofEnableDepthTest();
@@ -11,9 +13,35 @@ void ofApp::setupGLEnvironment(){
 }
 
 void ofApp::setupGLCamera(){
-    camera.setNearClip(0.0001);
-    camera.setFarClip(1000.0);
-    camera.setPosition(0.0, 0.0, -5.0);
+    staticCamera.storePosition("Back", ofPoint(5, 3, 10));
+    staticCamera.storePosition("Front", ofPoint(-5, 1, 6));
+    staticCamera.setCurve(EASE_IN_EASE_OUT);
+    staticCamera.setRepeatType(LOOP_BACK_AND_FORTH);
+    staticCamera.startMovement("Back", "Front", 30.0);
+
+    insertionCamera.storePosition("Hand", ofPoint(5,2,0.5));
+    insertionCamera.storePosition("FarBack", ofPoint(5,5,150));
+    insertionCamera.storePosition("Above", ofPoint(-1,50,1));
+    insertionCamera.storePosition("GroundFar", ofPoint(0,0, -10));
+    insertionCamera.storePosition("Below", ofPoint(1,-10,-10));
+    insertionCamera.storePosition("Distant", ofPoint(-25,-15,-50));
+    insertionCamera.storePosition("Fish", ofPoint(100,-5,-10));
+    insertionCamera.storePosition("Center", ofPoint(10,10,10));
+    insertionCamera.storePosition("Subjective", ofPoint(1,2,-5));
+    insertionCamera.setHysteresis(5000);
+
+    lightDrones[0].storePosition("FarAbove", ofPoint(0.0, 52.0, -100.0));
+    lightDrones[0].storePosition("NearAbove", ofPoint(0.0, 52.0, 100.0));
+    lightDrones[0].startMovement("FarAbove", "NearAbove", 30);
+
+    lightDrones[1].storePosition("FarAbove", ofPoint(100.0, 52.0, -100.0));
+    lightDrones[1].storePosition("NearAbove", ofPoint(-100.0, 52.0, 100.0));
+    lightDrones[1].startMovement("FarAbove", "NearAbove", 20);
+
+    lightDrones[2].storePosition("FarAbove", ofPoint(0.0, -100.0, 0.0));
+    lightDrones[2].storePosition("NearAbove", ofPoint(0.0, 100.0, 0.0));
+    lightDrones[2].startMovement("FarAbove", "NearAbove", 50);
+
 }
 
 void ofApp::setupGLBuffer(){
@@ -22,7 +50,8 @@ void ofApp::setupGLBuffer(){
     timeSpread = 0.5;
 
     pointCloud.setup();
-    spectrogram.setup();
+    futureSpectrogram.setup(true);
+    pastSpectrogram.setup(false);
     guiEnabled = false;
     boxEnabled = false;
 
@@ -40,19 +69,6 @@ void ofApp::setupObject(){
     scaleAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
     scaleAnimation.setDuration(15);
     scaleAnimation.animateTo( 2.8 );
-
-
-    lightAnimation.setPosition(ofPoint(0.0, 35.0, 25.0));
-    lightAnimation.setCurve(EASE_IN_EASE_OUT);
-    lightAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
-    lightAnimation.setDuration(10);
-    lightAnimation.animateTo(ofPoint(0.0, 35.0, 150.0));
-
-    pointLight.setSpotlight();
-    pointLight.setAttenuation(1.5,0.,0.);
-    pointLight.setDiffuseColor(ofColor::lightGray);
-    pointLight.setSpecularColor(ofColor::silver);
-
 }
 
 void ofApp::setupGL(){
@@ -65,7 +81,8 @@ void ofApp::setupGL(){
 void ofApp::audioSetup(){
     ofSoundStreamSetup(kNumOutput, kNumInput, this, kSampleRate, ofxPd::blockSize()*8, 3);
     pdGainBuffer = std::vector<float>(kNumBins, 0.0);
-    pdSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
+    pdFutureSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
+    pdPastSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
 
     pd.init(kNumOutput, kNumInput, kSampleRate);
     pd.openPatch("spectrum.pd");
@@ -93,13 +110,17 @@ void ofApp::setup(){
     kinectSetup();
     pointCloud.setup();
     gui.setup();
+    manualCamera = false;
+    trigger = Trigger::Stay;
 }
 
 // update
 
 
-void ofApp::updateGainContour()
-{
+void ofApp::updateGainContour(){
+    static Trigger previousStat;
+    float gainSum = 0;
+    static float previousGainSum = 0;
     for(int i = 0; i < kNumBins;i++){
         float findex = static_cast<float>(i) * widthToBinRatio;
         float floor = std::floor(findex);
@@ -113,21 +134,44 @@ void ofApp::updateGainContour()
             float gainVal = (gainRight-gainLeft) * weight + gainLeft;
             pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
+        gainSum += pdGainBuffer[i];
     }
+
+    Trigger status = gainSum > kEnterThreshold ? Trigger::Enter : Trigger::Exit;
+    trigger = (previousStat == status) ? Trigger::Stay : status;
+    previousStat = status;
 }
 
 void ofApp::update(){
-    scaleAnimation.update(1/30.0);
-    lightAnimation.update(1/30.0);
+    updateGainContour();
+    pd.writeArray("gain", pdGainBuffer);
+    gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
 
-    pointLight.setPosition(lightAnimation.getCurrentPosition());
+    scaleAnimation.update(1/30.0);
+    if(trigger == Trigger::Enter){
+        if(!insertionCamera.isRunning()){
+            int startPos = ofRandom(8.99);
+            int endPos = ofRandom(8.99);
+            float duration = ofRandom(5.0)+5.0;
+            insertionCamera.startMovement(positionNames[startPos], positionNames[endPos], duration);
+        }
+    }else if(trigger == Trigger::Exit){
+        insertionCamera.stopMovement();
+    }
+
+    if(insertionCamera.isRunning()){
+        insertionCamera.stepForward();
+    }else{
+        staticCamera.stepForward();
+    }
+    for(auto &lightDrone : lightDrones){lightDrone.stepForward();}
     timeSpread = scaleAnimation.val();
 
     // read spectrum
-
-
-    pd.readArray("spectrum", pdSpectrumBuffer);
-    spectrogram.update(pdSpectrumBuffer);
+    pd.readArray("pastSpectrum", pdPastSpectrumBuffer);
+    pastSpectrogram.update(pdPastSpectrumBuffer);
+    pd.readArray("futureSpectrum" , pdFutureSpectrumBuffer);
+    futureSpectrogram.update(pdFutureSpectrumBuffer);
 
     // read kinect data and sonificate
     kinect.update();
@@ -138,16 +182,26 @@ void ofApp::update(){
 
         pointCloud.update(kinect.getDepthPixels(),gainContour,distanceThreshold);
     }
-    updateGainContour();
-    pd.writeArray("gain", pdGainBuffer);
-    gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
 
 }
 
 void ofApp::drawWorld(){
+    ofEnableLighting();
+    for(auto &lightDrone: lightDrones){lightDrone.enable();}
 
-    camera.begin();
-    camera.lookAt(ofVec3f(0,0,0));
+    if(manualCamera){
+        camera.begin();
+    }else{
+        if(insertionCamera.isRunning()){
+            insertionCamera.begin();
+            insertionCamera.lookAt(ofVec3f(0,0,0));
+        }else{
+            staticCamera.begin();
+            staticCamera.lookAt(ofVec3f(0,0,0));
+           // ofLog() << staticCamera.getPosition();
+
+        }
+    }
 
     if(boxEnabled){
         ofNoFill();
@@ -155,46 +209,36 @@ void ofApp::drawWorld(){
     }
 
     pointCloud.draw();
-    ofSetColor(ofColor(255,255,255,125));
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
-
-    ofEnableLighting();
-    pointLight.enable();
-    spectrogram.draw(sliceDist, timeSpread);
-    pointLight.disable();
-
-    ofDisableLighting();
+    pastSpectrogram.draw(sliceDist, timeSpread);
 
     ofPushMatrix();
-    ofTranslate(lightAnimation.getCurrentPosition());
-    ofDrawSphere(1);
+    ofRotateY(180);
+    futureSpectrogram.draw(sliceDist, timeSpread);
     ofPopMatrix();
+
     scanner.draw();
-    camera.end();
+    //for(auto &lightDrone: lightDrones){lightDrone.draw();}
+
+    if(manualCamera){camera.end();}
+    else{
+       insertionCamera.isRunning() ? insertionCamera.end() : staticCamera.end();
+    }
+
+    for(auto &lightDrone: lightDrones){lightDrone.disable();}
+    ofDisableLighting();
+
 }
 
 void ofApp::drawGui(){
     gui.begin();
-    auto pos = camera.getPosition();
-
-    float x = pos.x;
-    float y = pos.y;
-    float z = pos.z;
     int thresh = distanceThreshold;
     if(ImGui::SliderInt("distThresh", &thresh, 0, 255)){
         distanceThreshold = thresh;
     }
-
-    bool changed = false;
-    if(ImGui::SliderFloat("x", &x, -3.0, 3.0)) changed = true;
-    if(ImGui::SliderFloat("y", &y, -3.0, 3.0)) changed = true;
-    if(ImGui::SliderFloat("z", &z, -15.0, 5.0)) changed = true;
-
     ImGui::SliderFloat("slice dist", &sliceDist, 0.0, 1.0);
     ImGui::SliderFloat("time spread", &timeSpread, 0.0, 5.0);
 
-    if(changed)camera.setPosition(ofVec3f(x,y,z));
-   // ImGui::Text(ofToString(validPixelCount).c_str());
     gui.end();
 }
 
@@ -233,6 +277,9 @@ void ofApp::keyPressed(int key){
         break;
     case 't':
         pd.sendBang("testTone");
+        break;
+    case 'c':
+        manualCamera = !manualCamera;
         break;
     }
 }

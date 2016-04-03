@@ -5,7 +5,7 @@
 
 class Spectrogram{
 public:
-    void setup();
+    void setup(bool reverse);
     void update(const std::vector<float> &pdSpectrumBuffer);
     void draw(const float& sliceDist, const float& timeSpread);
 
@@ -16,12 +16,15 @@ protected:
     std::vector<ofPoint> spectrogramVertices;
     std::vector<ofPoint> spectrogramNormals;
     ofVbo spectrogramVbo;
+    bool reverse{false};
 
 };
 
-inline void Spectrogram::setup(){
-    spectrogramMaterial.setDiffuseColor(ofColor::gray);
+inline void Spectrogram::setup(bool reverse){
+    this->reverse = std::move(reverse);
+    spectrogramMaterial.setDiffuseColor(ofColor::white);
     spectrogramMaterial.setSpecularColor(ofColor::lightBlue);
+    spectrogramMaterial.setAmbientColor(ofColor::white);
     spectrogramMaterial.setShininess(30);
 
     spectrogramVertices.reserve(kNumVertices);
@@ -58,7 +61,7 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 }
 
 inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
-    ofSetColor(ofColor(125,125,255, 150));
+    ofSetLineWidth(2);
     spectrogramMaterial.begin();
     for(int i = 0; i < kNumTimeSlices;i++){
 
@@ -72,8 +75,14 @@ inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
         glScalef(scale, 1, scale);
 
         // offset target row for rendering
-        int readHead = recordHead - i;
-        while(readHead < 0) readHead += kNumTimeSlices;
+        int readHead;
+        if(reverse){
+            readHead = recordHead +i;
+            while(readHead >= kNumTimeSlices) readHead -= kNumTimeSlices;
+        }else{
+            readHead = recordHead -i;
+            while(readHead < 0) readHead += kNumTimeSlices;
+        }
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();

@@ -27,3 +27,6 @@ const int kNumOutput = 2;
 
 const float widthToBinRatio = static_cast<float>(kKinectWidth) / static_cast<float>(kNumBins);
 const float binToWidhRatio = static_cast<float>(kNumBins) / static_cast<float>(kKinectWidth);
+
+const float kEnterThreshold = 100;
+const float kExitThreshold = 100;
