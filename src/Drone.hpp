@@ -63,10 +63,12 @@ public:
     virtual void stopMovement();
     void stepForward();
     void setHysteresis(int);
+    void setLookAt(ofNode node);
 protected:
     int hysteresis;
     int timeDifference();
     std::chrono::time_point<std::chrono::steady_clock> lastCommandTime;
+    ofNode lookAtNode;
 };
 
 inline int CameraDrone::timeDifference(){
@@ -94,10 +96,17 @@ inline void CameraDrone::stopMovement(){
     }
 }
 
+inline void CameraDrone::setLookAt(ofNode node){
+    lookAtNode = node;
+}
+
+
 inline void CameraDrone::stepForward(){
     Drone::stepForward();
+    lookAt(lookAtNode);
     setPosition(movingPos.getCurrentPosition());
 }
+
 
 // Light Drone
 class LightDrone: public ofLight, public Drone {
@@ -116,13 +125,11 @@ inline void LightDrone::stepForward(){
 }
 
 inline void LightDrone::draw(){
-    ofDisableLighting();
     ofSetColor(ofColor::red);
     ofPushMatrix();
     ofTranslate(movingPos.getCurrentPosition());
     ofDrawSphere(1.0);
     ofPopMatrix();
-    ofEnableLighting();
 
 
 }

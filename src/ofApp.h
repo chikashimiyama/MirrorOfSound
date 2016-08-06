@@ -48,13 +48,10 @@ protected:
     float sliceDist;
     float timeSpread;
 
-    std::array<LightDrone, 3> lightDrones;
 
     CameraDrone staticCamera;
-    CameraDrone insertionCamera;
-    ofEasyCam camera;
-    bool manualCamera;
-
+    ofNode targetObject;
+    ofCamera camera;
     ofxPd pd;
     ofxImGui gui;
     ofxAnimatableFloat anim;
@@ -66,14 +63,14 @@ protected:
 
     //3D spectrogram based on Pd
     std::vector<float> pdPastSpectrumBuffer;
-    std::vector<float> pdFutureSpectrumBuffer;
+    std::vector<float> pdFeedbackSpectrumBuffer;
     std::vector<float> pdGainBuffer;
     std::vector<float> pdMaterialBuffer;
 
     ofxAnimatableFloat scaleAnimation;
 
     Scanner scanner;
-    Spectrogram futureSpectrogram, pastSpectrogram;
+    Spectrogram pastSpectrogram;
 
     void setupGL();
     void audioSetup();

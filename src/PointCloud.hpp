@@ -56,8 +56,6 @@ inline void PointCloud::update(const ofPixels &pixels, std::vector<ofPoint> &gai
 }
 
 inline void PointCloud::draw(){
-    ofDisableLighting();
     pointCloudVbo.draw(GL_POINTS, 0, validPixelCount);
-    ofEnableLighting();
 
 }

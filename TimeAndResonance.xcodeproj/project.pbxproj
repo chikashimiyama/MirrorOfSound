@@ -39,11 +39,9 @@
 		49BEEB2DFA5319D55AA6899F /* tilt.c in Sources */ = {isa = PBXBuildFile; fileRef = BF2F2AA872288D30F53983EF /* tilt.c */; };
 		49C1EFD45F6BB2292E09D84D /* d_osc.c in Sources */ = {isa = PBXBuildFile; fileRef = F27EC6FE253F687FADCA4055 /* d_osc.c */; };
 		4C7BC3489171413574CC398B /* PdBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0BBB709C1538C828C1BC70FB /* PdBase.cpp */; };
-		4F28B7D6C432C068AAE90B90 /* main.o in Sources */ = {isa = PBXBuildFile; fileRef = 98F1F03F755FE27B1E3240DA /* main.o */; };
 		50F096CFDBAD1EC45E92416E /* m_atom.c in Sources */ = {isa = PBXBuildFile; fileRef = BB7AD905C0E049138E942045 /* m_atom.c */; };
 		52C77060FBB9307AEFDAE8C6 /* ofxAnimatable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F7CFEE77982205D3F1496C03 /* ofxAnimatable.cpp */; };
 		5472CCBDC7B6C1AF21661319 /* s_main.c in Sources */ = {isa = PBXBuildFile; fileRef = F96600F815252113425D4E74 /* s_main.c */; };
-		5915A78336F60C55D1632357 /* SimpleTest in Sources */ = {isa = PBXBuildFile; fileRef = 9FC19B1D38303F2CCD721471 /* SimpleTest */; };
 		5C2607C471F8D48C0036C56E /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6CF9B1FD213484DDDB7AE362 /* imgui.cpp */; };
 		5D067CF087427621DD1E64B8 /* ofxAnimatableFloat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1C9E4AC6CF4626BA74F7E994 /* ofxAnimatableFloat.cpp */; };
 		60CEF052E3D03AF6216E6390 /* x_acoustics.c in Sources */ = {isa = PBXBuildFile; fileRef = 2EE5752FE9F3922F36D2C46B /* x_acoustics.c */; };
@@ -103,7 +101,6 @@
 		D00C3EB2D372B107D709123B /* g_mycanvas.c in Sources */ = {isa = PBXBuildFile; fileRef = DC0D9EDA99DA7C6B6A1510BF /* g_mycanvas.c */; };
 		D21112A27514DAD7FEBE0E37 /* pdsched.c in Sources */ = {isa = PBXBuildFile; fileRef = 89F84ADD268FA369026A2843 /* pdsched.c */; };
 		D31F5C1B140C59B2AF1533A8 /* registration.c in Sources */ = {isa = PBXBuildFile; fileRef = 71958293AC5292DE4B7C619D /* registration.c */; };
-		D37D83A0D43EF0947E86E93D /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = F6863376B9FDA118A00CDB9A /* Makefile */; };
 		D8AFCED92D5514E8580A4ABC /* x_libpdreceive.c in Sources */ = {isa = PBXBuildFile; fileRef = 524BC63EACFB3776086FD775 /* x_libpdreceive.c */; };
 		D9AB994BC2BD19C9DBF8AD04 /* d_resample.c in Sources */ = {isa = PBXBuildFile; fileRef = 59F628DE75E715DA81DABB03 /* d_resample.c */; };
 		DAF420C3195DE839D5F3154B /* x_vexp.c in Sources */ = {isa = PBXBuildFile; fileRef = 389DBDD636F78AF2BDA79C13 /* x_vexp.c */; };
@@ -260,12 +257,10 @@
 		921EDDDC8947ED4636522712 /* s_print.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = s_print.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/s_print.c"; sourceTree = SOURCE_ROOT; };
 		9610C4966E67514DAEF1A186 /* PdMidiReceiver.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PdMidiReceiver.hpp; path = ../../../addons/ofxPd/libs/libpd/cpp/PdMidiReceiver.hpp; sourceTree = SOURCE_ROOT; };
 		97EC28001BC755001CA9E351 /* bonk~.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = "bonk~.c"; path = "../../../addons/ofxPd/libs/libpd/pure-data/extra/bonk~/bonk~.c"; sourceTree = SOURCE_ROOT; };
-		98F1F03F755FE27B1E3240DA /* main.o */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 30; name = main.o; path = "src/build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release/main.o"; sourceTree = SOURCE_ROOT; };
 		9AFC4007C93116900770D2AD /* x_vexp_fun.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_vexp_fun.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_vexp_fun.c"; sourceTree = SOURCE_ROOT; };
 		9C69DFEE749ABBCA5CBAB764 /* x_misc.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_misc.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_misc.c"; sourceTree = SOURCE_ROOT; };
 		9CC36552DD0A47E758D71FB5 /* imgui_demo.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = imgui_demo.cpp; path = ../../../addons/ofxImGui/libs/imgui/src/imgui_demo.cpp; sourceTree = SOURCE_ROOT; };
 		9E02D9F3A04B5573758EBCF8 /* imgui_draw.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = imgui_draw.cpp; path = ../../../addons/ofxImGui/libs/imgui/src/imgui_draw.cpp; sourceTree = SOURCE_ROOT; };
-		9FC19B1D38303F2CCD721471 /* SimpleTest */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 30; name = SimpleTest; path = "src/build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release/SimpleTest"; sourceTree = SOURCE_ROOT; };
 		A2BDF137E2A9EFF3694B25B4 /* g_graph.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = g_graph.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/g_graph.c"; sourceTree = SOURCE_ROOT; };
 		A3528DDFF05B00283552455D /* keep_alive.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = keep_alive.c; path = ../../../addons/ofxKinect/libs/libfreenect/src/keep_alive.c; sourceTree = SOURCE_ROOT; };
 		A3C9F26BBF6CBA68755EAEB6 /* g_hslider.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = g_hslider.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/g_hslider.c"; sourceTree = SOURCE_ROOT; };
@@ -332,7 +327,6 @@
 		F52CABD66BE8375361D3FB38 /* x_arithmetic.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_arithmetic.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_arithmetic.c"; sourceTree = SOURCE_ROOT; };
 		F56CC0679EEEB21C160FDA16 /* loop~.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = "loop~.c"; path = "../../../addons/ofxPd/libs/libpd/pure-data/extra/loop~/loop~.c"; sourceTree = SOURCE_ROOT; };
 		F67D12EE13E7FCA8DF0C9836 /* g_canvas.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = g_canvas.h; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/g_canvas.h"; sourceTree = SOURCE_ROOT; };
-		F6863376B9FDA118A00CDB9A /* Makefile */ = {isa = PBXFileReference; explicitFileType = file; fileEncoding = 30; name = Makefile; path = "src/build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release/Makefile"; sourceTree = SOURCE_ROOT; };
 		F6B1E0DF78EF7086AA13C343 /* d_delay.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = d_delay.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/d_delay.c"; sourceTree = SOURCE_ROOT; };
 		F7726CE92BC0F833C7140039 /* pique.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = pique.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/extra/pique/pique.c"; sourceTree = SOURCE_ROOT; };
 		F7CFEE77982205D3F1496C03 /* ofxAnimatable.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxAnimatable.cpp; path = ../../../addons/ofxAnimatable/src/ofxAnimatable.cpp; sourceTree = SOURCE_ROOT; };
@@ -381,16 +375,6 @@
 				F56CC0679EEEB21C160FDA16 /* loop~.c */,
 			);
 			name = "loop~";
-			sourceTree = "<group>";
-		};
-		163F8093842A61E8BEE13ED9 /* build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release */ = {
-			isa = PBXGroup;
-			children = (
-				98F1F03F755FE27B1E3240DA /* main.o */,
-				F6863376B9FDA118A00CDB9A /* Makefile */,
-				9FC19B1D38303F2CCD721471 /* SimpleTest */,
-			);
-			name = "build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release";
 			sourceTree = "<group>";
 		};
 		1AE6862ED862CA18468E0CCD /* include */ = {
@@ -827,7 +811,6 @@
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
 				BD6487157AF1D45EAA7F0334 /* Animation.hpp */,
-				163F8093842A61E8BEE13ED9 /* build-SimpleTest-Desktop_Qt_5_5_1_GCC_32bit-Release */,
 				0E382ED3E5D96162841F82AF /* const.hpp */,
 				524C223507459939300F7028 /* Drone.cpp */,
 				E2A006AC7B868A746046EF2D /* Drone.hpp */,
@@ -979,9 +962,6 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
-				4F28B7D6C432C068AAE90B90 /* main.o in Sources */,
-				D37D83A0D43EF0947E86E93D /* Makefile in Sources */,
-				5915A78336F60C55D1632357 /* SimpleTest in Sources */,
 				1F324F70C419FA4CF75BCFAE /* Drone.cpp in Sources */,
 				52C77060FBB9307AEFDAE8C6 /* ofxAnimatable.cpp in Sources */,
 				5D067CF087427621DD1E64B8 /* ofxAnimatableFloat.cpp in Sources */,

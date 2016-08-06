@@ -25,7 +25,7 @@ const int kSampleRate = 44100;
 const int kNumInput = 0;
 const int kNumOutput = 2;
 
-const float widthToBinRatio = static_cast<float>(kKinectWidth) / static_cast<float>(kNumBins);
+const float kWidthToBinRatio = static_cast<float>(kKinectWidth) / static_cast<float>(kNumBins);
 const float binToWidhRatio = static_cast<float>(kNumBins) / static_cast<float>(kKinectWidth);
 
 const float kEnterThreshold = 100;

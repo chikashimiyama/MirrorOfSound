@@ -5,53 +5,31 @@
 
 class Spectrogram{
 public:
-    void setup(bool reverse);
+    void setup();
     void update(const std::vector<float> &pdSpectrumBuffer);
     void draw(const float& sliceDist, const float& timeSpread);
 
 protected:
     int recordHead;
 
-    ofMaterial spectrogramMaterial;
     std::vector<ofPoint> spectrogramVertices;
-    std::vector<ofPoint> spectrogramNormals;
     ofVbo spectrogramVbo;
-    bool reverse{false};
 
 };
 
-inline void Spectrogram::setup(bool reverse){
-    this->reverse = std::move(reverse);
-    spectrogramMaterial.setDiffuseColor(ofColor::white);
-    spectrogramMaterial.setSpecularColor(ofColor::white);
-    spectrogramMaterial.setAmbientColor(ofColor::lightBlue);
-    spectrogramMaterial.setShininess(40);
-
+inline void Spectrogram::setup(){
     spectrogramVertices.reserve(kNumVertices);
-    spectrogramNormals = std::vector<ofPoint>(kNumVertices, ofPoint(0,1,0));
-    for(int i = 0; i < kNumTimeSlices; i++){
-        for(int j = 0; j < kNumBins; j++){
-            float phase = static_cast<float>(j) / static_cast<float>(kNumBins);
-            float x =  phase * 2.0 - 1.0;
-            float z =  sin(phase * M_PI);
-            spectrogramVertices.emplace_back(x,-1.0,z);
-        }
-    }
     spectrogramVbo.setVertexData(&spectrogramVertices[0],kNumVertices ,GL_DYNAMIC_DRAW);
-    spectrogramVbo.setNormalData(&spectrogramNormals[0], kNumVertices, GL_STATIC_DRAW);
-    spectrogramVbo.enableNormals();
 }
 
 inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
     int pixelOffset = recordHead * kNumBins;
 
     for(int i = 0; i < kNumBins ;i++){
-        float findex = static_cast<float>(i) * widthToBinRatio;
+        float findex = static_cast<float>(i) * kWidthToBinRatio;
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);
-
-
         spectrogramVertices[pixelOffset+i].y = pdSpectrumBuffer[i] - 1.0;
     }
     spectrogramVbo.updateVertexData(&spectrogramVertices[0], kNumVertices );
@@ -61,8 +39,8 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 }
 
 inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
-    ofSetLineWidth(2);
-    spectrogramMaterial.begin();
+    ofSetLineWidth(1);
+    ofSetColor(ofColor::white);
     for(int i = 0; i < kNumTimeSlices;i++){
 
         // distance from the center
@@ -76,17 +54,11 @@ inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
 
         // offset target row for rendering
         int readHead;
-        if(reverse){
-            readHead = recordHead +i;
-            while(readHead >= kNumTimeSlices) readHead -= kNumTimeSlices;
-        }else{
-            readHead = recordHead -i;
-            while(readHead < 0) readHead += kNumTimeSlices;
-        }
+        readHead = recordHead -i;
+        while(readHead < 0) readHead += kNumTimeSlices;
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();
     }
-    spectrogramMaterial.end();
 
 }
