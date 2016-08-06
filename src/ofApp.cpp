@@ -92,7 +92,7 @@ void ofApp::updateGainContour(){
     float gainSum = 0;
     static float previousGainSum = 0;
     for(int i = 0; i < kNumBins;i++){
-        float findex = static_cast<float>(i) * widthToBinRatio;
+        float findex = static_cast<float>(i) * kWidthToBinRatio;
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);

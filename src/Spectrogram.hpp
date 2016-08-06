@@ -19,6 +19,12 @@ protected:
 
 inline void Spectrogram::setup(){
     spectrogramVertices.reserve(kNumVertices);
+    for(int i = 0; i < kNumTimeSlices; i++){
+        for(int j = 0; j < kNumBins; j++){
+            float phase = static_cast<float>(j) / static_cast<float>(kNumBins);
+            spectrogramVertices.emplace_back(2.0 * phase - 1.0,-1.0,0);
+        }
+    }
     spectrogramVbo.setVertexData(&spectrogramVertices[0],kNumVertices ,GL_DYNAMIC_DRAW);
 }
 
