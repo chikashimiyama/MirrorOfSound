@@ -1,0 +1,51 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "127C01357C755E93F81D90ADF10A290E7C194913",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "89EC939148DF5B01DEF16D5BAE581F3D5560271C" : 0,
+    "55505DE6675E1AEB4CF72AD63A972936EC984D97" : 0,
+    "127C01357C755E93F81D90ADF10A290E7C194913" : 0,
+    "32C9357E6BFA4C30CF0000521A92DF84B7FBC79F" : 0,
+    "90C00904F36E6ADB57A7313E998815D255B0DEAF" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "20B4CF69-552E-4AF2-A4C5-C98650E67693",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "89EC939148DF5B01DEF16D5BAE581F3D5560271C" : "..\/..\/addons\/ofxPd",
+    "55505DE6675E1AEB4CF72AD63A972936EC984D97" : "..\/..\/addons\/ofxImGui",
+    "127C01357C755E93F81D90ADF10A290E7C194913" : "TimeAndResonance\/",
+    "32C9357E6BFA4C30CF0000521A92DF84B7FBC79F" : "..\/..\/addons\/ofxAnimatable",
+    "90C00904F36E6ADB57A7313E998815D255B0DEAF" : "TimeAndResonance\/src\/SimpleTest\/Catch\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "TimeAndResonance",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "TimeAndResonance.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/chikashimiyama\/TimeAndResonance.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "127C01357C755E93F81D90ADF10A290E7C194913"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/armadillu\/ofxAnimatable.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "32C9357E6BFA4C30CF0000521A92DF84B7FBC79F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/jvcleave\/ofxImGui.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "55505DE6675E1AEB4CF72AD63A972936EC984D97"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/danomatika\/ofxPd.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "89EC939148DF5B01DEF16D5BAE581F3D5560271C"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/philsquared\/Catch.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "90C00904F36E6ADB57A7313E998815D255B0DEAF"
+    }
+  ]
+}
