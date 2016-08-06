@@ -46,12 +46,15 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 
 inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
     ofSetLineWidth(1);
-    ofSetColor(ofColor::white);
+    ofColor fadeColor = ofColor::white;
+    fadeColor.a = 255.0;
+    float fadeStep = 255.0/static_cast<float>(kNumTimeSlices);
+    
     for(int i = 0; i < kNumTimeSlices;i++){
 
-        // distance from the center
+        ofSetColor(fadeColor);
         float distance = sliceDist * i;
-        float scale = 1 + i * timeSpread;
+        float scale = 1 + timeSpread  * i;
 
         ofPushMatrix();
         glTranslatef(0,0,distance );
@@ -65,6 +68,8 @@ inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();
+        
+        fadeColor.a -= fadeStep;
     }
 
 }

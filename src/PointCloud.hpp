@@ -23,8 +23,8 @@ inline void PointCloud::setup(){
 
     pointCloudVertices = std::vector<ofPoint>(kNumKinectPixels, ofPoint(0,0,0));
     pointCloudColors = std::vector<ofFloatColor>(kNumKinectPixels, ofColor::white);
-    pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumVertices, GL_DYNAMIC_DRAW);
-    pointCloudVbo.setColorData(&pointCloudColors[0], kNumVertices, GL_DYNAMIC_DRAW);
+    pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumKinectPixels, GL_DYNAMIC_DRAW);
+    pointCloudVbo.setColorData(&pointCloudColors[0], kNumKinectPixels, GL_DYNAMIC_DRAW);
 }
 
 inline void PointCloud::update(const ofPixels &pixels, std::vector<ofPoint> &gainContour, const float &distanceThreshold){

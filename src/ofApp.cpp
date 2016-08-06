@@ -1,7 +1,6 @@
 #include "ofApp.h"
 using namespace pd;
 
-const std::vector<std::string> ofApp::positionNames = {"Hand", "FarBack","Above","GroundFar","Below","Distant","Fish","Center", "Subjective"};
 
 void ofApp::setupGLEnvironment(){
     ofSetBackgroundColor(0);
@@ -13,23 +12,14 @@ void ofApp::setupGLEnvironment(){
 }
 
 void ofApp::setupGLCamera(){
-    staticCamera.storePosition("SideA", ofPoint(-10, 1, 10));
-    staticCamera.storePosition("SideB", ofPoint(-9, 1, 11));
-    targetObject.setPosition(ofPoint(0, 0, 5));
-    staticCamera.setLookAt(targetObject);
-    staticCamera.setCurve(EASE_IN_EASE_OUT);
-    staticCamera.setRepeatType(LOOP_BACK_AND_FORTH);
-    staticCamera.startMovement("SideA", "SideB", 30.0);
-    
-    camera.setPosition(-10, 1, -1);
     targetObject.setPosition(ofPoint(0, 1, 5));
+    camera.setPosition(-10, 1, -1);
     camera.lookAt(targetObject);
+    camera.setFarClip(500);
+    camera.setNearClip(0.01);
 }
 
 void ofApp::setupGLBuffer(){
-    distanceThreshold = 100;
-    sliceDist = 1.0;
-    timeSpread = 1.0;
 
     pointCloud.setup();
     pastSpectrogram.setup();
@@ -61,8 +51,21 @@ void ofApp::audioSetup(){
 }
 
 
+void ofApp::guiSetup(){
+    
+    gui.setup();
+
+    gui.add(spread.setup("spread", 0.15, 0, 1.0));
+    gui.add(distance.setup("distance", 0.7, 0.0, 1.0));
+    gui.add(lookAt.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
+    gui.add(cameraPos.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
+    gui.add(distThreshold.setup("dist thresh", 100, 0, 500));
+
+
+}
+
 void ofApp::kinectSetup(){
-    kinect.init();
+    kinect.init(true,false,false); // we need only infrared
     kinect.open();if(kinect.isConnected()) {
         ofLogNotice() << "sensor-emitter dist: " << kinect.getSensorEmitterDistance() << "cm";
         ofLogNotice() << "sensor-camera dist:  " << kinect.getSensorCameraDistance() << "cm";
@@ -72,15 +75,18 @@ void ofApp::kinectSetup(){
         ofLog() << "kinect not found";
         ofExit(1);
     }
+
 }
 
 void ofApp::setup(){
+    ofEnableSmoothing();
+    ofEnableAntiAliasing();
+
     kinectSetup();
     setupGL();
     audioSetup();
-    kinectSetup();
+    guiSetup();
     pointCloud.setup();
-    gui.setup();
     trigger = Trigger::Stay;
 }
 
@@ -96,15 +102,16 @@ void ofApp::updateGainContour(){
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);
+        int tableIndex = kNumBins-1-i;
         if(index >= kKinectWidth-1){
-            pdGainBuffer[i] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
+            pdGainBuffer[tableIndex] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
         }else{
             float gainLeft = gainContour[index].y;
             float gainRight = gainContour[index+1].y;
             float gainVal = (gainRight-gainLeft) * weight + gainLeft;
-            pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
+            pdGainBuffer[tableIndex] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
-        gainSum += pdGainBuffer[i];
+        gainSum += pdGainBuffer[tableIndex];
     }
 
     Trigger status = gainSum > kEnterThreshold ? Trigger::Enter : Trigger::Exit;
@@ -123,9 +130,10 @@ void ofApp::update(){
         
     }
 
-    staticCamera.stepForward();
-    timeSpread = 1.0;
-
+    // camera
+    camera.setPosition(cameraPos);
+    camera.lookAt(lookAt);
+    
     // read spectrum
     pd.readArray("pastSpectrum", pdPastSpectrumBuffer);
     pastSpectrogram.update(pdPastSpectrumBuffer);
@@ -137,7 +145,7 @@ void ofApp::update(){
             point.y = -1.0;
         });
 
-        pointCloud.update(kinect.getDepthPixels(),gainContour,distanceThreshold);
+        pointCloud.update(kinect.getDepthPixels(),gainContour,distThreshold);
     }
 
 }
@@ -148,28 +156,29 @@ void ofApp::drawWorld(){
 
     if(boxEnabled){ ofNoFill();ofDrawBox(2,2,2);}
     pointCloud.draw();
+    
+    ofSetLineWidth(2);
+    ofSetColor(ofColor::orange);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
-    pastSpectrogram.draw(sliceDist, timeSpread);
+    
+    
+    pastSpectrogram.draw(distance, spread);
 
     ofPushMatrix();
     ofRotateY(180);
     ofPopMatrix();
     scanner.draw();
+    
+    
     camera.end();
-
 
 }
 
 void ofApp::drawGui(){
-    gui.begin();
-    int thresh = distanceThreshold;
-    if(ImGui::SliderInt("distThresh", &thresh, 0, 255)){
-        distanceThreshold = thresh;
-    }
-    ImGui::SliderFloat("slice dist", &sliceDist, 0.0, 1.0);
-    ImGui::SliderFloat("time spread", &timeSpread, 0.0, 5.0);
-
-    gui.end();
+    ofSetColor(255, 255, 255, 255);
+    ofDisableDepthTest();
+    gui.draw();
+    ofEnableDepthTest();
 }
 
 void ofApp::draw(){

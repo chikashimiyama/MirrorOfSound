@@ -1,7 +1,7 @@
 #pragma once
 #include "ofMain.h"
+#include "ofxGui.h"
 #include "ofxPd.h"
-#include "ofxImGui.h"
 #include "ofxKinect.h"
 #include "ofxAnimatableFloat.h"
 #include "ofxAnimatableOfPoint.h"
@@ -44,16 +44,11 @@ protected:
     bool boxEnabled;
 
     int validPixelCount;
-    unsigned char distanceThreshold;
-    float sliceDist;
-    float timeSpread;
-
 
     CameraDrone staticCamera;
     ofNode targetObject;
     ofCamera camera;
     ofxPd pd;
-    ofxImGui gui;
     ofxAnimatableFloat anim;
     ofxKinect kinect;
 
@@ -68,7 +63,12 @@ protected:
     std::vector<float> pdMaterialBuffer;
 
     ofxAnimatableFloat scaleAnimation;
-
+    ofxPanel gui;
+    ofxFloatSlider distance;
+    ofxFloatSlider spread;
+    ofxVec3Slider lookAt;
+    ofxVec3Slider cameraPos;
+    ofxIntSlider distThreshold;
     Scanner scanner;
     Spectrogram pastSpectrogram;
 
@@ -76,7 +76,7 @@ protected:
     void audioSetup();
     void storageSetup();
     void kinectSetup();
-
+    void guiSetup();
 
     void setupGLEnvironment();
     void setupGLCamera();
@@ -86,7 +86,6 @@ protected:
     void drawGui();
     void updateGainContour();
 
-    static const std::vector<std::string> positionNames;
     void triggerInsertionCamera();
 };
 

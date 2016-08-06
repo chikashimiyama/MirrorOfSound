@@ -1,4 +1,4 @@
 ofxAnimatable
-ofxImGui
+ofxGui
 ofxKinect
 ofxPd
