@@ -8,7 +8,8 @@
 #include "PointCloud.hpp"
 #include "Spectrogram.hpp"
 #include "const.hpp"
-#include "Scanner.h"
+#include "Drone.hpp"
+#include "Scanner.hpp"
 
 class ofApp : public ofBaseApp{
 
@@ -32,6 +33,13 @@ public:
     void gainContourFromPd();
 
 protected:
+    enum class Trigger{
+        Enter =0,
+        Exit = 1,
+        Stay = 2
+    };
+
+    Trigger trigger;
     bool guiEnabled;
     bool boxEnabled;
 
@@ -40,7 +48,13 @@ protected:
     float sliceDist;
     float timeSpread;
 
-    ofCamera camera;
+    std::array<LightDrone, 3> lightDrones;
+
+    CameraDrone staticCamera;
+    CameraDrone insertionCamera;
+    ofEasyCam camera;
+    bool manualCamera;
+
     ofxPd pd;
     ofxImGui gui;
     ofxAnimatableFloat anim;
@@ -51,16 +65,15 @@ protected:
     PointCloud pointCloud;
 
     //3D spectrogram based on Pd
-    std::vector<float> pdSpectrumBuffer;
+    std::vector<float> pdPastSpectrumBuffer;
+    std::vector<float> pdFutureSpectrumBuffer;
     std::vector<float> pdGainBuffer;
     std::vector<float> pdMaterialBuffer;
 
-    ofLight pointLight;
     ofxAnimatableFloat scaleAnimation;
-    ofxAnimatableOfPoint lightAnimation;
 
     Scanner scanner;
-    Spectrogram spectrogram;
+    Spectrogram futureSpectrogram, pastSpectrogram;
 
     void setupGL();
     void audioSetup();
@@ -75,5 +88,8 @@ protected:
     void drawWorld();
     void drawGui();
     void updateGainContour();
+
+    static const std::vector<std::string> positionNames;
+    void triggerInsertionCamera();
 };
 

@@ -12,13 +12,22 @@ Project{
         name: { return FileInfo.baseName(path) }
 
         files: [
-            'src/main.cpp',
-            'src/ofApp.cpp',
-            'src/ofApp.h',
+            "src/Drone.cpp",
+            "src/Drone.hpp",
+            "src/PointCloud.hpp",
+            "src/Scanner.hpp",
+            "src/Spectrogram.hpp",
+            "src/const.hpp",
+            "src/main.cpp",
+            "src/ofApp.cpp",
+            "src/ofApp.h",
         ]
 
-        of.addons: [
-            'ofxKinect'
+        of.addons: [            
+            'ofxKinect',
+            'ofxPd',
+            'ofxImGui',
+            'ofxAnimatable'
         ]
 
         // additional flags for the project. the of module sets some
