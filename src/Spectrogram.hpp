@@ -11,7 +11,6 @@ public:
 
 protected:
     int recordHead;
-
     std::vector<ofPoint> spectrogramVertices;
     ofVbo spectrogramVbo;
     bool reverse;
@@ -30,7 +29,6 @@ inline void Spectrogram::setup(bool rev){
         }
     }
     spectrogramVbo.setVertexData(&spectrogramVertices[0],kNumVertices ,GL_DYNAMIC_DRAW);
-
 }
 
 inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){

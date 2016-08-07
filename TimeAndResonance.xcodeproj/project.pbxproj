@@ -19,7 +19,6 @@
 		1CD33E884D9E3358252E82A1 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 907C5B5E104864A2D3A25745 /* ofxToggle.cpp */; };
 		1D7B9BAA73D029B7D342BD10 /* fiddle~.c in Sources */ = {isa = PBXBuildFile; fileRef = 87C6F9279A2560DDAC6D0B2D /* fiddle~.c */; };
 		1EC960D751D8E0563978C717 /* lrshift~.c in Sources */ = {isa = PBXBuildFile; fileRef = 91AD602F84E295D4A339DABB /* lrshift~.c */; };
-		1F324F70C419FA4CF75BCFAE /* Drone.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 524C223507459939300F7028 /* Drone.cpp */; };
 		21A059755481CC0BF969FD2D /* keep_alive.c in Sources */ = {isa = PBXBuildFile; fileRef = A3528DDFF05B00283552455D /* keep_alive.c */; };
 		21DE514257119B92345B0900 /* g_graph.c in Sources */ = {isa = PBXBuildFile; fileRef = A2BDF137E2A9EFF3694B25B4 /* g_graph.c */; };
 		255A7B680DC81E543C875794 /* usb_libusb10.c in Sources */ = {isa = PBXBuildFile; fileRef = 28F9707464BA3FF98E05096C /* usb_libusb10.c */; };
@@ -214,7 +213,6 @@
 		515E593073CA88F62A0C63DE /* s_audio.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = s_audio.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/s_audio.c"; sourceTree = SOURCE_ROOT; };
 		51D837462D91A0E2799F53D4 /* x_gui.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_gui.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_gui.c"; sourceTree = SOURCE_ROOT; };
 		524BC63EACFB3776086FD775 /* x_libpdreceive.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_libpdreceive.c; path = ../../../addons/ofxPd/libs/libpd/libpd_wrapper/x_libpdreceive.c; sourceTree = SOURCE_ROOT; };
-		524C223507459939300F7028 /* Drone.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = Drone.cpp; path = src/Drone.cpp; sourceTree = SOURCE_ROOT; };
 		52AFA1F08C420992CAAAE648 /* ofxSlider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxSlider.h; path = ../../../addons/ofxGui/src/ofxSlider.h; sourceTree = SOURCE_ROOT; };
 		553E49923295D33C5D28005E /* x_vexp.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = x_vexp.h; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_vexp.h"; sourceTree = SOURCE_ROOT; };
 		59F628DE75E715DA81DABB03 /* d_resample.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = d_resample.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/d_resample.c"; sourceTree = SOURCE_ROOT; };
@@ -276,7 +274,6 @@
 		BB7AD905C0E049138E942045 /* m_atom.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = m_atom.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/m_atom.c"; sourceTree = SOURCE_ROOT; };
 		BC8923D9E506707DE397F553 /* x_scalar.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = x_scalar.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/x_scalar.c"; sourceTree = SOURCE_ROOT; };
 		BC97B96C0FDBFEEBC54BDB16 /* Spectrogram.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Spectrogram.hpp; path = src/Spectrogram.hpp; sourceTree = SOURCE_ROOT; };
-		BD6487157AF1D45EAA7F0334 /* Animation.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Animation.hpp; path = src/Animation.hpp; sourceTree = SOURCE_ROOT; };
 		BF2F2AA872288D30F53983EF /* tilt.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = tilt.c; path = ../../../addons/ofxKinect/libs/libfreenect/src/tilt.c; sourceTree = SOURCE_ROOT; };
 		BFEC3B1999A2F53AEE97A33D /* PdBase.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = PdBase.hpp; path = ../../../addons/ofxPd/libs/libpd/cpp/PdBase.hpp; sourceTree = SOURCE_ROOT; };
 		C13BBD58C569986BABEF4C2F /* g_canvas.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = g_canvas.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/g_canvas.c"; sourceTree = SOURCE_ROOT; };
@@ -301,7 +298,6 @@
 		E0A7F4D96739AAA8844FBEA0 /* d_ugen.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = d_ugen.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/d_ugen.c"; sourceTree = SOURCE_ROOT; };
 		E112B3AEBEA2C091BF2B40AE /* ofxPanel.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxPanel.cpp; path = ../../../addons/ofxGui/src/ofxPanel.cpp; sourceTree = SOURCE_ROOT; };
 		E1246AD4E3D8F6DCABDDAC02 /* d_global.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.c; fileEncoding = 30; name = d_global.c; path = "../../../addons/ofxPd/libs/libpd/pure-data/src/d_global.c"; sourceTree = SOURCE_ROOT; };
-		E2A006AC7B868A746046EF2D /* Drone.hpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = Drone.hpp; path = src/Drone.hpp; sourceTree = SOURCE_ROOT; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E4B69B5B0A3A1756003C02F2 /* TimeAndResonanceDebug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TimeAndResonanceDebug.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4B69E1D0A3A1BDC003C02F2 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = src/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -781,9 +777,6 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1E0A3A1BDC003C02F2 /* ofApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* ofApp.h */,
-				BD6487157AF1D45EAA7F0334 /* Animation.hpp */,
-				524C223507459939300F7028 /* Drone.cpp */,
-				E2A006AC7B868A746046EF2D /* Drone.hpp */,
 				DFD6307527B00CAF6A11F974 /* PointCloud.hpp */,
 				42162E90FE760888D21B1D48 /* Scanner.hpp */,
 				BC97B96C0FDBFEEBC54BDB16 /* Spectrogram.hpp */,
@@ -932,7 +925,6 @@
 			files = (
 				E4B69E200A3A1BDC003C02F2 /* main.cpp in Sources */,
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
-				1F324F70C419FA4CF75BCFAE /* Drone.cpp in Sources */,
 				52C77060FBB9307AEFDAE8C6 /* ofxAnimatable.cpp in Sources */,
 				5D067CF087427621DD1E64B8 /* ofxAnimatableFloat.cpp in Sources */,
 				74D31933EE82E12834DB3B06 /* ofxAnimatableOfColor.cpp in Sources */,
