@@ -2,6 +2,8 @@
 #pragma once
 #include "ofMain.h"
 
+const std::string patchname = "audio.pd";
+
 const int kMaxTouch = 8;
 const int kWidth = 1980;
 const int kHeight = 1024;

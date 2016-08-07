@@ -46,7 +46,7 @@ void ofApp::audioSetup(){
     pdPastSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
 
     pd.init(kNumOutput, kNumInput, kSampleRate);
-    pd.openPatch("spectrum.pd");
+    pd.openPatch(patchname);
     pd.start();
 }
 
