@@ -51,25 +51,21 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 
 inline void Spectrogram::draw(){
     ofSetLineWidth(1);
-    
-    float maxDistance = kDistanceBetweenLines * (kNumTimeSlices-1);
-    float maxSpread = kLineSpread* (kNumTimeSlices-1);
-
     float step = 0.0;
     for(int i = 0; i < kNumTimeSlices;i++){
 
-        float distance = kDistanceBetweenLines * i;
-        float scale = 1 + kLineSpread  * i;
-        if(reverse) distance = maxDistance - distance;
-        if(reverse) scale = 1 + maxSpread - kLineSpread * i;
-        
+        float distance = reverse?  kMaxDistance - kDistanceBetweenLines * i : kDistanceBetweenLines * i;
+        float scale = 1 + (reverse? kMaxSpread - kLineSpread * i: kLineSpread  * i);
         float alpha = reverse ? step : 1.0 - step;
+        
         ofPushMatrix();
         ofSetColor(ofFloatColor(1.0,1.0,1.0, alpha));
         glTranslatef(0,0,distance );
         glScalef(scale, 1, scale);
+        
         int readHead = recordHead -i;
         if(readHead < 0) readHead += kNumTimeSlices;
+
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();

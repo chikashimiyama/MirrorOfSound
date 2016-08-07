@@ -37,3 +37,5 @@ const float kEnterThreshold = 100;
 const float kExitThreshold = 100;
 const float kDistanceBetweenLines = 0.7;
 const float kLineSpread = 0.15;
+const float kMaxDistance = kDistanceBetweenLines * (kNumTimeSlices-1);
+const float kMaxSpread = kLineSpread* (kNumTimeSlices-1);

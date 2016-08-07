@@ -48,10 +48,6 @@ protected:
     
     std::vector<ofPoint> gainContour; // passed to Pd table
     ofVbo gainContourVbo;
-
-    std::vector<ofPoint> gridVertices;
-    std::vector<ofFloatColor> gridColor;
-    ofVbo gridVbo;
     
     //camera in OpenGL
     ofNode lookAtObject;

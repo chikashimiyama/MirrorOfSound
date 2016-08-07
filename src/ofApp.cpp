@@ -38,17 +38,6 @@ void ofApp::setupGLBuffer(){
         gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
     }
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
-
-    for(int i = 0; i < kNumTimeSlices; i++){
-        float spread = static_cast<float>(i) * kLineSpread + 1;
-        float distance = static_cast<float>(i) * kDistanceBetweenLines;
-        gridVertices.emplace_back(-spread,-1, distance);
-        gridVertices.emplace_back(spread ,-1, distance );
-        gridColor.emplace_back(ofColor(100,100,100,255 - i*2));
-        gridColor.emplace_back(ofColor(100,100,100,255 - i*2));
-    }
-    gridVbo.setVertexData(&gridVertices[0], kNumTimeSlices*2, GL_STATIC_DRAW);
-    gridVbo.setColorData(&gridColor[0], kNumTimeSlices*2, GL_STATIC_DRAW);
 }
 
 void ofApp::audioSetup(){
@@ -177,9 +166,6 @@ void ofApp::drawWorld(){
     ofSetColor(ofColor::orange);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
-    // draw ground lines
-    //ofSetLineWidth(1);
-    //gridVbo.draw(GL_LINES, 0, kNumTimeSlices);
     
     pastSpectrogram.draw();
 
