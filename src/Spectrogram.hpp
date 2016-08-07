@@ -38,18 +38,15 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
     recordHead++;
     recordHead %= kNumTimeSlices;
 
-    
     int pixelOffset = recordHead * kNumBins;
+    int index = reverse ? kNumBins-1 : 0;
+    int incr = reverse? -1 : 1;
 
     for(int i = 0; i < kNumBins ;i++){
-        float findex = static_cast<float>(i) * kWidthToBinRatio;
-        float floor = std::floor(findex);
-        float weight = findex - floor;
-        int index = static_cast<int>(floor);
-        spectrogramVertices[pixelOffset+i].y = pdSpectrumBuffer[i] - 1.0;
+        spectrogramVertices[pixelOffset+i].y = pdSpectrumBuffer[index] - 1.0;
+        index += incr;
     }
     spectrogramVbo.updateVertexData(&spectrogramVertices[0], kNumVertices );
-
 }
 
 inline void Spectrogram::draw(){
