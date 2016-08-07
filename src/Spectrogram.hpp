@@ -29,6 +29,11 @@ inline void Spectrogram::setup(){
 }
 
 inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
+    
+    recordHead++;
+    recordHead %= kNumTimeSlices;
+
+    
     int pixelOffset = recordHead * kNumBins;
 
     for(int i = 0; i < kNumBins ;i++){
@@ -39,8 +44,6 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
         spectrogramVertices[pixelOffset+i].y = pdSpectrumBuffer[i] - 1.0;
     }
     spectrogramVbo.updateVertexData(&spectrogramVertices[0], kNumVertices );
-    recordHead++;
-    recordHead %= kNumTimeSlices;
 
 }
 
@@ -58,12 +61,10 @@ inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
 
         ofPushMatrix();
         glTranslatef(0,0,distance );
-
         glScalef(scale, 1, scale);
 
         // offset target row for rendering
-        int readHead;
-        readHead = recordHead -i;
+        int readHead = recordHead -i;
         while(readHead < 0) readHead += kNumTimeSlices;
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);

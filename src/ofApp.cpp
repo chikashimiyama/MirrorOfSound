@@ -21,28 +21,33 @@ void ofApp::setupGLCamera(){
     lookAtAnimation.setCurve(EASE_IN_EASE_OUT);
     lookAtAnimation.animateTo(ofPoint(-0.3, 0.6, 4.1));
 
-    
     cameraAnimation.setPosition(ofPoint(-3., 0.1, -0.7));
     cameraAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
     cameraAnimation.setCurve(EASE_IN_EASE_OUT);
     cameraAnimation.animateTo(ofPoint(-5.1, -2.14, -0.816));
-    
-    
-    
 }
 
 void ofApp::setupGLBuffer(){
-
     pointCloud.setup();
     pastSpectrogram.setup();
     guiEnabled = false;
     boxEnabled = false;
-
     gainContour.reserve(kKinectWidth);
     for(int i = 0; i < kKinectWidth ;i++){
         gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
     }
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
+
+    for(int i = 0; i < kNumTimeSlices; i++){
+        float spread = static_cast<float>(i) * 0.15 + 1;
+        float distance = static_cast<float>(i) * 0.7;
+        gridVertices.emplace_back(-spread,-1, distance);
+        gridVertices.emplace_back(spread ,-1, distance );
+        gridColor.emplace_back(ofColor(100,100,100,255 - i*2));
+        gridColor.emplace_back(ofColor(100,100,100,255 - i*2));
+    }
+    gridVbo.setVertexData(&gridVertices[0], kNumTimeSlices*2, GL_STATIC_DRAW);
+    gridVbo.setColorData(&gridColor[0], kNumTimeSlices*2, GL_STATIC_DRAW);
 }
 
 void ofApp::audioSetup(){
@@ -50,7 +55,6 @@ void ofApp::audioSetup(){
     pdGainBuffer = std::vector<float>(kNumBins, 0.0);
     pdFeedbackSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
     pdPastSpectrumBuffer = std::vector<float>(kNumBins, 0.0);
-
     pd.init(kNumOutput, kNumInput, kSampleRate);
     pd.openPatch(patchname);
     pd.start();
@@ -58,16 +62,12 @@ void ofApp::audioSetup(){
 
 
 void ofApp::guiSetup(){
-    
     gui.setup();
-
     gui.add(spreadSlider.setup("spread", 0.15, 0, 1.0));
     gui.add(distanceSlider.setup("distance", 0.7, 0.0, 1.0));
     gui.add(lookAtSlider.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(cameraPosSlider.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(distThresholdSlider.setup("dist thresh", 100, 0, 500));
-
-
 }
 
 void ofApp::kinectSetup(){
@@ -81,13 +81,11 @@ void ofApp::kinectSetup(){
         ofLog() << "kinect not found";
         ofExit(1);
     }
-
 }
 
 void ofApp::setup(){
     ofEnableSmoothing();
     ofEnableAntiAliasing();
-
     kinectSetup();
     ofSetFrameRate(kTargetFPS);
     setupGLEnvironment();
@@ -102,6 +100,7 @@ void ofApp::setup(){
 #pragma mark update;
 
 void ofApp::updateGainContour(){
+
     static Trigger previousStat;
     float gainSum = 0;
     static float previousGainSum = 0;
@@ -110,7 +109,7 @@ void ofApp::updateGainContour(){
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);
-        int tableIndex = kNumBins-1-i;
+        int tableIndex = i;
         if(index >= kKinectWidth-1){
             pdGainBuffer[tableIndex] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
         }else{
@@ -121,7 +120,6 @@ void ofApp::updateGainContour(){
         }
         gainSum += pdGainBuffer[tableIndex];
     }
-
     Trigger status = gainSum > kEnterThreshold ? Trigger::Enter : Trigger::Exit;
     trigger = (previousStat == status) ? Trigger::Stay : status;
     previousStat = status;
@@ -153,7 +151,6 @@ void ofApp::update(){
     camera.setPosition(currentCamera);
     camera.lookAt(currentLookAt);
     
-    
     // read spectrum
     pd.readArray("pastSpectrum", pdPastSpectrumBuffer);
     pastSpectrogram.update(pdPastSpectrumBuffer);
@@ -164,10 +161,8 @@ void ofApp::update(){
         std::for_each(gainContour.begin(), gainContour.end(), [](ofPoint & point){
             point.y = -1.0;
         });
-
         pointCloud.update(kinect.getDepthPixels(),gainContour,kExitThreshold);
     }
-
 }
 
 void ofApp::drawWorld(){
@@ -180,6 +175,10 @@ void ofApp::drawWorld(){
     ofSetLineWidth(2);
     ofSetColor(ofColor::orange);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
+
+    ofSetLineWidth(1);
+    gridVbo.draw(GL_LINES, 0, kNumTimeSlices);
+    
     pastSpectrogram.draw(distanceSlider, spreadSlider);
 
     ofPushMatrix();
@@ -202,8 +201,6 @@ void ofApp::draw(){
     drawWorld();
     if(guiEnabled)drawGui();
 }
-
-
 
 void ofApp::exit(){
     kinect.setCameraTiltAngle(0); // zero the tilt on exit
