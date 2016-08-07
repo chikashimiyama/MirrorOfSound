@@ -99,6 +99,7 @@ void ofApp::setup(){
 
 #pragma mark update;
 
+
 void ofApp::updateGainContour(){
 
     static Trigger previousStat;
@@ -176,6 +177,7 @@ void ofApp::drawWorld(){
     ofSetColor(ofColor::orange);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
+    // draw ground lines
     ofSetLineWidth(1);
     gridVbo.draw(GL_LINES, 0, kNumTimeSlices);
     
