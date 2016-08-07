@@ -97,16 +97,15 @@ void ofApp::updateGainContour(){
         float floor = std::floor(findex);
         float weight = findex - floor;
         int index = static_cast<int>(floor);
-        int tableIndex = i;
         if(index >= kKinectWidth-1){
-            pdGainBuffer[tableIndex] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
+            pdGainBuffer[i] = ofMap(gainContour[kKinectWidth-1].y, -1.0, 1.0, 0.0, 1.0, true);
         }else{
             float gainLeft = gainContour[index].y;
             float gainRight = gainContour[index+1].y;
             float gainVal = (gainRight-gainLeft) * weight + gainLeft;
-            pdGainBuffer[tableIndex] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
+            pdGainBuffer[i] = ofMap(gainVal, -1.0,1.0,0.0,1.0, true);
         }
-        gainSum += pdGainBuffer[tableIndex];
+        gainSum += pdGainBuffer[i];
     }
     Trigger status = gainSum > kEnterThreshold ? Trigger::Enter : Trigger::Exit;
     trigger = (previousStat == status) ? Trigger::Stay : status;

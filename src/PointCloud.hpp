@@ -20,7 +20,6 @@ protected:
 
 inline void PointCloud::setup(){
 
-
     pointCloudVertices = std::vector<ofPoint>(kNumKinectPixels, ofPoint(0,0,0));
     pointCloudColors = std::vector<ofFloatColor>(kNumKinectPixels, ofColor::white);
     pointCloudVbo.setVertexData(&pointCloudVertices[0],kNumKinectPixels, GL_DYNAMIC_DRAW);
@@ -35,15 +34,15 @@ inline void PointCloud::update(const ofPixels &pixels, std::vector<ofPoint> &gai
         if( distance > distanceThreshold){
             float y = static_cast<float>(i / kKinectWidth);
             float x = static_cast<float>(i % kKinectWidth);
-            pointCloudVertices[validPixelCount].x = (x - kHalfKinectWidthFloat) / kHalfKinectWidth;
+            pointCloudVertices[validPixelCount].x = (x - kHalfKinectWidthFloat) / -kHalfKinectWidth;
             pointCloudVertices[validPixelCount].y = (y -kHalfKinectHeightFloat) / -kHalfKinectHeightFloat;
             float z = (static_cast<float>(distance) - 128.0) / -64.0 + 1.0;
             pointCloudVertices[validPixelCount].z = z;
             if(z < 0.0){ // enter negative side
                 pointCloudColors[validPixelCount] = ofColor::white;
-                float max = gainContour[x].y;
+                float max = gainContour[kKinectWidth-1-x].y;
                 if(max < y){
-                   gainContour[x].y = pointCloudVertices[validPixelCount].y;
+                   gainContour[kKinectWidth-1-x].y = pointCloudVertices[validPixelCount].y;
                 }
             }else{
                  pointCloudColors[validPixelCount] = ofColor::gray;
