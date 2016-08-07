@@ -55,6 +55,11 @@ void ofApp::guiSetup(){
     gui.add(lookAtSlider.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(cameraPosSlider.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(distThresholdSlider.setup("dist thresh", 100, 0, 500));
+    
+    ofFile file(ofToDataPath("Settings.xml"));
+    if(file.exists()){
+        gui.loadFromFile(ofToDataPath("Settings.xml"));
+    }
 }
 
 void ofApp::kinectSetup(){
@@ -166,7 +171,7 @@ void ofApp::update(){
         std::for_each(gainContour.begin(), gainContour.end(), [](ofPoint & point){
             point.y = -1.0;
         });
-        pointCloud.update(kinect.getDepthPixels(),gainContour,kExitThreshold);
+        pointCloud.update(kinect.getDepthPixels(),gainContour,distThresholdSlider);
     }
 }
 
