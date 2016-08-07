@@ -5,4 +5,4 @@ Music doesn’t exist now. It only exists in the future and the past; musical no
 
 The source code of this art work is under GPL 3.0 protected.
 
-Copyright (C)2016 Chikashi Miyama  all  rights reserved.
+Copyright (C) 2016 Chikashi Miyama  all  rights reserved.
