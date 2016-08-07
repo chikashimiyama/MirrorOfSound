@@ -81,7 +81,7 @@ protected:
     void setupObject();
     void drawWorld();
     void drawGui();
-    void updateGainContour();
+    float updateGainContour();
 
 };
 

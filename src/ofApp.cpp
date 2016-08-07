@@ -87,7 +87,7 @@ void ofApp::setup(){
 #pragma mark update;
 
 
-void ofApp::updateGainContour(){
+float ofApp::updateGainContour(){
 
     static Trigger previousStat;
     float gainSum = 0;
@@ -110,19 +110,26 @@ void ofApp::updateGainContour(){
     Trigger status = gainSum > kEnterThreshold ? Trigger::Enter : Trigger::Exit;
     trigger = (previousStat == status) ? Trigger::Stay : status;
     previousStat = status;
+    return gainSum / kNumBins;
 }
 
 void ofApp::update(){
-    updateGainContour();
+    
+    // gain contour
+    float gainAvg = updateGainContour();
     pd.writeArray("gain", pdGainBuffer);
     gainContourVbo.updateVertexData(&gainContour[0], kKinectWidth);
 
+    // trigger application
     if(trigger == Trigger::Enter){
-
+        
     }else if(trigger == Trigger::Exit){
         
     }
+    unsigned char fillAlpha = static_cast<unsigned char>(ofClamp(gainAvg * 1024.0, 0.0, 255.0));
+    unsigned char frameAlpha = 255;
     
+    scanner.update(fillAlpha , frameAlpha);
     // camera
     cameraAnimation.update(kCameraSpeed);
     lookAtAnimation.update(kCameraSpeed);
@@ -143,7 +150,9 @@ void ofApp::update(){
     pd.readArray("futureSpectrum",pdFutureSpectrumBuffer);
     pastSpectrogram.update(pdPastSpectrumBuffer);
     futureSpectrogram.update(pdFutureSpectrumBuffer);
-
+    
+    
+    
     // read kinect data and sonificate
     kinect.update();
     if(kinect.isFrameNewDepth()){
@@ -161,10 +170,9 @@ void ofApp::drawWorld(){
     if(boxEnabled){ ofNoFill();ofDrawBox(2,2,2);}
     pointCloud.draw();
     
-    ofSetLineWidth(2);
-    ofSetColor(ofColor::orange);
+    ofSetLineWidth(1);
+    ofSetColor(ofColor::lightBlue);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
-
     
     pastSpectrogram.draw();
 
