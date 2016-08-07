@@ -8,7 +8,6 @@
 #include "PointCloud.hpp"
 #include "Spectrogram.hpp"
 #include "const.hpp"
-#include "Drone.hpp"
 #include "Scanner.hpp"
 
 class ofApp : public ofBaseApp{
