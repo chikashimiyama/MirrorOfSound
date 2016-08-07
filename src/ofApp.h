@@ -42,11 +42,16 @@ protected:
 
     // kinect and point cloud
     ofxKinect kinect;
-    std::vector<ofPoint> gainContour; // passed to Pd table
-    ofVbo gainContourVbo;
     PointCloud pointCloud;
     Scanner scanner;
-    Spectrogram pastSpectrogram;
+    Spectrogram pastSpectrogram, futureSpectrogram;
+    
+    std::vector<ofPoint> gainContour; // passed to Pd table
+    ofVbo gainContourVbo;
+
+    std::vector<ofPoint> gridVertices;
+    std::vector<ofFloatColor> gridColor;
+    ofVbo gridVbo;
     
     //camera in OpenGL
     ofNode lookAtObject;
