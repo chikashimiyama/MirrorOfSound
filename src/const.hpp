@@ -33,7 +33,7 @@ const int kNumOutput = 2;
 const float kWidthToBinRatio = static_cast<float>(kKinectWidth) / static_cast<float>(kNumBins);
 const float binToWidhRatio = static_cast<float>(kNumBins) / static_cast<float>(kKinectWidth);
 
-const float kEnterThreshold = 100;
+const float kEnterThreshold = 25;
 const float kExitThreshold = 100;
 const float kDistanceBetweenLines = 0.7;
 const float kLineSpread = 0.15;

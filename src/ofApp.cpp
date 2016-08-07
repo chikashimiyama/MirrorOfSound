@@ -122,10 +122,14 @@ void ofApp::update(){
 
     // trigger application
     if(trigger == Trigger::Enter){
-        
+        touchEffect.reset(0.0);
+        touchEffect.setDuration(1.0);
+        touchEffect.setCurve(EASE_OUT);
+        touchEffect.animateTo(1.0);
     }else if(trigger == Trigger::Exit){
-        
+//        touchEffect.reset();
     }
+    
     unsigned char fillAlpha = static_cast<unsigned char>(ofClamp(gainAvg * 1024.0, 0.0, 255.0));
     unsigned char frameAlpha = 255;
     
@@ -151,7 +155,10 @@ void ofApp::update(){
     pastSpectrogram.update(pdPastSpectrumBuffer);
     futureSpectrogram.update(pdFutureSpectrumBuffer);
     
-    
+    // effect
+    if(touchEffect.isAnimating()){
+        touchEffect.update(0.02);
+    }
     
     // read kinect data and sonificate
     kinect.update();
@@ -174,6 +181,7 @@ void ofApp::drawWorld(){
     ofSetColor(ofColor::lightBlue);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
     
+    // spectrograms
     pastSpectrogram.draw();
 
     ofPushMatrix();
@@ -182,10 +190,22 @@ void ofApp::drawWorld(){
     futureSpectrogram.draw();
     ofPopMatrix();
     
+    // scanner
     ofPushMatrix();
     ofRotateY(180);
     ofPopMatrix();
     scanner.draw();
+    
+    // effect
+    if(touchEffect.isAnimating()){
+        ofPushMatrix();
+        float value = touchEffect.getCurrentValue();
+        ofSetColor(ofFloatColor(0.6,0.9,0.9,1.0-value ));
+        float scale = value* 10;
+        ofScale(scale, scale);
+        ofDrawRectangle(-1,-1, 2,2);
+        ofPopMatrix();
+    }
     
     camera.end();
 }

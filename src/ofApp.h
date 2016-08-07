@@ -55,6 +55,10 @@ protected:
     ofCamera camera;
     ofxAnimatableOfPoint cameraAnimation;
     
+    
+    //effect
+    ofxAnimatableFloat touchEffect;
+    
     // pure data
     ofxPd pd;
     std::vector<float> pdPastSpectrumBuffer, pdFutureSpectrumBuffer;
