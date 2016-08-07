@@ -5,27 +5,32 @@
 
 class Spectrogram{
 public:
-    void setup();
+    void setup(bool rev = false);
     void update(const std::vector<float> &pdSpectrumBuffer);
-    void draw(const float& sliceDist, const float& timeSpread);
+    void draw();
 
 protected:
     int recordHead;
 
     std::vector<ofPoint> spectrogramVertices;
     ofVbo spectrogramVbo;
-
+    bool reverse;
 };
 
-inline void Spectrogram::setup(){
+inline void Spectrogram::setup(bool rev){
+    reverse = rev;
     spectrogramVertices.reserve(kNumVertices);
+    
     for(int i = 0; i < kNumTimeSlices; i++){
+        float alpha = rev ? kNumTimeSlices * i :(1.0 - kRNumTimeSlices * i);
+        
         for(int j = 0; j < kNumBins; j++){
             float phase = static_cast<float>(j) / static_cast<float>(kNumBins);
             spectrogramVertices.emplace_back(2.0 * phase - 1.0,-1.0,0);
         }
     }
     spectrogramVbo.setVertexData(&spectrogramVertices[0],kNumVertices ,GL_DYNAMIC_DRAW);
+
 }
 
 inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
@@ -47,30 +52,31 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 
 }
 
-inline void Spectrogram::draw(const float& sliceDist, const float& timeSpread){
+inline void Spectrogram::draw(){
     ofSetLineWidth(1);
-    ofColor fadeColor = ofColor::white;
-    fadeColor.a = 255.0;
-    float fadeStep = 255.0/static_cast<float>(kNumTimeSlices);
     
+    float maxDistance = kDistanceBetweenLines * (kNumTimeSlices-1);
+    float maxSpread = kLineSpread* (kNumTimeSlices-1);
+
+    float step = 0.0;
     for(int i = 0; i < kNumTimeSlices;i++){
 
-        ofSetColor(fadeColor);
-        float distance = sliceDist * i;
-        float scale = 1 + timeSpread  * i;
-
+        float distance = kDistanceBetweenLines * i;
+        float scale = 1 + kLineSpread  * i;
+        if(reverse) distance = maxDistance - distance;
+        if(reverse) scale = 1 + maxSpread - kLineSpread * i;
+        
+        float alpha = reverse ? step : 1.0 - step;
         ofPushMatrix();
+        ofSetColor(ofFloatColor(1.0,1.0,1.0, alpha));
         glTranslatef(0,0,distance );
         glScalef(scale, 1, scale);
-
-        // offset target row for rendering
         int readHead = recordHead -i;
-        while(readHead < 0) readHead += kNumTimeSlices;
+        if(readHead < 0) readHead += kNumTimeSlices;
         int offset = readHead * kNumBins;
         spectrogramVbo.draw(GL_LINE_STRIP, offset, kNumBins);
         ofPopMatrix();
-        
-        fadeColor.a -= fadeStep;
+        step += kRNumTimeSlices/2;
     }
 
 }

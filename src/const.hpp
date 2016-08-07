@@ -21,6 +21,7 @@ const float kHalfKinectWidthFloat = static_cast<float>(kHalfKinectWidth);
 const int kNumKinectPixels = kKinectHeight * kKinectWidth;
 
 const int kNumTimeSlices = 128;
+const float kRNumTimeSlices = 1.0 / static_cast<float>(kNumTimeSlices);
 const int kNumBins = 1024;
 const int kHalfNumBins = kNumBins / 2;
 const int kNumVertices = kNumBins * kNumTimeSlices;
@@ -34,3 +35,5 @@ const float binToWidhRatio = static_cast<float>(kNumBins) / static_cast<float>(k
 
 const float kEnterThreshold = 100;
 const float kExitThreshold = 100;
+const float kDistanceBetweenLines = 0.7;
+const float kLineSpread = 0.15;

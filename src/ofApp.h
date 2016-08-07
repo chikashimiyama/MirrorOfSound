@@ -62,15 +62,13 @@ protected:
     
     // pure data
     ofxPd pd;
-    std::vector<float> pdPastSpectrumBuffer;
+    std::vector<float> pdPastSpectrumBuffer, pdFutureSpectrumBuffer;
     std::vector<float> pdFeedbackSpectrumBuffer;
     std::vector<float> pdGainBuffer;
     std::vector<float> pdMaterialBuffer;
 
     //GUI
     ofxPanel gui;
-    ofxFloatSlider distanceSlider;
-    ofxFloatSlider spreadSlider;
     ofxVec3Slider lookAtSlider;
     ofxVec3Slider cameraPosSlider;
     ofxIntSlider distThresholdSlider;

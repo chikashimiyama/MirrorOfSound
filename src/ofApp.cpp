@@ -30,6 +30,7 @@ void ofApp::setupGLCamera(){
 void ofApp::setupGLBuffer(){
     pointCloud.setup();
     pastSpectrogram.setup();
+    futureSpectrogram.setup(true);
     guiEnabled = false;
     boxEnabled = false;
     gainContour.reserve(kKinectWidth);
@@ -39,8 +40,8 @@ void ofApp::setupGLBuffer(){
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
 
     for(int i = 0; i < kNumTimeSlices; i++){
-        float spread = static_cast<float>(i) * 0.15 + 1;
-        float distance = static_cast<float>(i) * 0.7;
+        float spread = static_cast<float>(i) * kLineSpread + 1;
+        float distance = static_cast<float>(i) * kDistanceBetweenLines;
         gridVertices.emplace_back(-spread,-1, distance);
         gridVertices.emplace_back(spread ,-1, distance );
         gridColor.emplace_back(ofColor(100,100,100,255 - i*2));
@@ -60,11 +61,8 @@ void ofApp::audioSetup(){
     pd.start();
 }
 
-
 void ofApp::guiSetup(){
     gui.setup();
-    gui.add(spreadSlider.setup("spread", 0.15, 0, 1.0));
-    gui.add(distanceSlider.setup("distance", 0.7, 0.0, 1.0));
     gui.add(lookAtSlider.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(cameraPosSlider.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
     gui.add(distThresholdSlider.setup("dist thresh", 100, 0, 500));
@@ -154,7 +152,9 @@ void ofApp::update(){
     
     // read spectrum
     pd.readArray("pastSpectrum", pdPastSpectrumBuffer);
+    pd.readArray("futureSpectrum",pdFutureSpectrumBuffer);
     pastSpectrogram.update(pdPastSpectrumBuffer);
+    futureSpectrogram.update(pdFutureSpectrumBuffer);
 
     // read kinect data and sonificate
     kinect.update();
@@ -178,11 +178,17 @@ void ofApp::drawWorld(){
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
 
     // draw ground lines
-    ofSetLineWidth(1);
-    gridVbo.draw(GL_LINES, 0, kNumTimeSlices);
+    //ofSetLineWidth(1);
+    //gridVbo.draw(GL_LINES, 0, kNumTimeSlices);
     
-    pastSpectrogram.draw(distanceSlider, spreadSlider);
+    pastSpectrogram.draw();
 
+    ofPushMatrix();
+    ofTranslate(0,-2,0);
+    ofRotateZ(180);
+    futureSpectrogram.draw();
+    ofPopMatrix();
+    
     ofPushMatrix();
     ofRotateY(180);
     ofPopMatrix();
