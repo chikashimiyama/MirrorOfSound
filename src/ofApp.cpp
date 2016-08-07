@@ -19,12 +19,12 @@ void ofApp::setupGLCamera(){
     lookAtAnimation.setPosition(ofPoint(-0.2, 0, 2.35));
     lookAtAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
     lookAtAnimation.setCurve(EASE_IN_EASE_OUT);
-    lookAtAnimation.animateTo(ofPoint(-0.3, 0.6, 4.1));
+    lookAtAnimation.animateTo(ofPoint(-0.6, 0, 3.2));
 
     cameraAnimation.setPosition(ofPoint(-3., 0.1, -0.7));
     cameraAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
     cameraAnimation.setCurve(EASE_IN_EASE_OUT);
-    cameraAnimation.animateTo(ofPoint(-5.1, -2.14, -0.816));
+    cameraAnimation.animateTo(ofPoint(2.14, -0.1, -1.63));
 }
 
 void ofApp::setupGLBuffer(){
