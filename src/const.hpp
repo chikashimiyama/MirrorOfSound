@@ -3,11 +3,11 @@
 #include "ofMain.h"
 
 const std::string patchname = "audio.pd";
-
+const int kTargetFPS = 30;
 const int kMaxTouch = 8;
 const int kWidth = 1980;
 const int kHeight = 1024;
-
+const float kCameraSpeed = 0.0008;
 const int kKinectHeight = 480;
 const int kHalfKinectHeight = kKinectHeight /2;
 const float kKinectHeightFloat = static_cast<float>(kKinectHeight);

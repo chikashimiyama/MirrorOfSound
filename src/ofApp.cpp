@@ -1,6 +1,7 @@
 #include "ofApp.h"
 using namespace pd;
 
+#pragma mark setups
 
 void ofApp::setupGLEnvironment(){
     ofSetBackgroundColor(0);
@@ -12,11 +13,22 @@ void ofApp::setupGLEnvironment(){
 }
 
 void ofApp::setupGLCamera(){
-    targetObject.setPosition(ofPoint(0, 1, 5));
-    camera.setPosition(-10, 1, -1);
-    camera.lookAt(targetObject);
     camera.setFarClip(500);
     camera.setNearClip(0.01);
+    
+    lookAtAnimation.setPosition(ofPoint(-0.2, 0, 2.35));
+    lookAtAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
+    lookAtAnimation.setCurve(EASE_IN_EASE_OUT);
+    lookAtAnimation.animateTo(ofPoint(-0.3, 0.6, 4.1));
+
+    
+    cameraAnimation.setPosition(ofPoint(-3., 0.1, -0.7));
+    cameraAnimation.setRepeatType(LOOP_BACK_AND_FORTH);
+    cameraAnimation.setCurve(EASE_IN_EASE_OUT);
+    cameraAnimation.animateTo(ofPoint(-5.1, -2.14, -0.816));
+    
+    
+    
 }
 
 void ofApp::setupGLBuffer(){
@@ -31,12 +43,6 @@ void ofApp::setupGLBuffer(){
         gainContour.emplace_back(static_cast<float>(i) / kHalfKinectWidthFloat-1.0, -1, 0.0);
     }
     gainContourVbo.setVertexData(&gainContour[0], kKinectWidth, GL_DYNAMIC_DRAW);
-}
-
-void ofApp::setupGL(){
-    setupGLEnvironment();
-    setupGLCamera();
-    setupGLBuffer();
 }
 
 void ofApp::audioSetup(){
@@ -55,11 +61,11 @@ void ofApp::guiSetup(){
     
     gui.setup();
 
-    gui.add(spread.setup("spread", 0.15, 0, 1.0));
-    gui.add(distance.setup("distance", 0.7, 0.0, 1.0));
-    gui.add(lookAt.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
-    gui.add(cameraPos.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
-    gui.add(distThreshold.setup("dist thresh", 100, 0, 500));
+    gui.add(spreadSlider.setup("spread", 0.15, 0, 1.0));
+    gui.add(distanceSlider.setup("distance", 0.7, 0.0, 1.0));
+    gui.add(lookAtSlider.setup("lookat", ofVec3f(-0.2, 0, 2.35), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
+    gui.add(cameraPosSlider.setup("cameraPos", ofVec3f(-3., 0.1, -0.7), ofVec3f(-10,-10,-10), ofVec3f(10,10,10)));
+    gui.add(distThresholdSlider.setup("dist thresh", 100, 0, 500));
 
 
 }
@@ -83,15 +89,17 @@ void ofApp::setup(){
     ofEnableAntiAliasing();
 
     kinectSetup();
-    setupGL();
+    ofSetFrameRate(kTargetFPS);
+    setupGLEnvironment();
+    setupGLCamera();
+    setupGLBuffer();
     audioSetup();
     guiSetup();
     pointCloud.setup();
     trigger = Trigger::Stay;
 }
 
-// update
-
+#pragma mark update;
 
 void ofApp::updateGainContour(){
     static Trigger previousStat;
@@ -129,10 +137,22 @@ void ofApp::update(){
     }else if(trigger == Trigger::Exit){
         
     }
-
+    
     // camera
-    camera.setPosition(cameraPos);
-    camera.lookAt(lookAt);
+    cameraAnimation.update(kCameraSpeed);
+    lookAtAnimation.update(kCameraSpeed);
+    ofPoint currentCamera, currentLookAt;
+    if(guiEnabled){
+        currentCamera = cameraPosSlider;
+        currentLookAt = lookAtSlider;
+    }else{
+        currentCamera= cameraAnimation.getCurrentPosition();
+        currentLookAt = lookAtAnimation.getCurrentPosition();
+    }
+    
+    camera.setPosition(currentCamera);
+    camera.lookAt(currentLookAt);
+    
     
     // read spectrum
     pd.readArray("pastSpectrum", pdPastSpectrumBuffer);
@@ -145,7 +165,7 @@ void ofApp::update(){
             point.y = -1.0;
         });
 
-        pointCloud.update(kinect.getDepthPixels(),gainContour,distThreshold);
+        pointCloud.update(kinect.getDepthPixels(),gainContour,kExitThreshold);
     }
 
 }
@@ -160,18 +180,14 @@ void ofApp::drawWorld(){
     ofSetLineWidth(2);
     ofSetColor(ofColor::orange);
     gainContourVbo.draw(GL_LINE_STRIP, 0, kKinectWidth );
-    
-    
-    pastSpectrogram.draw(distance, spread);
+    pastSpectrogram.draw(distanceSlider, spreadSlider);
 
     ofPushMatrix();
     ofRotateY(180);
     ofPopMatrix();
     scanner.draw();
     
-    
     camera.end();
-
 }
 
 void ofApp::drawGui(){
@@ -187,11 +203,7 @@ void ofApp::draw(){
     if(guiEnabled)drawGui();
 }
 
-void ofApp::windowResized(int w, int h){
-}
 
-void ofApp::gotMessage(ofMessage msg){
-}
 
 void ofApp::exit(){
     kinect.setCameraTiltAngle(0); // zero the tilt on exit

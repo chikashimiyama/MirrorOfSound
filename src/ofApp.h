@@ -19,17 +19,13 @@ public:
     void update();
     void draw();
 
-    void windowResized(int w, int h);
-    void gotMessage(ofMessage msg);
     // audio callbacks
-
     void audioReceived(float * input, int bufferSize, int nChannels);
     void audioRequested(float * output, int bufferSize, int nChannels);
     void exit();
 
     void keyPressed(int key);
     void setupGLGainContour();
-
     void gainContourFromPd();
 
 protected:
@@ -39,40 +35,43 @@ protected:
         Stay = 2
     };
 
-    Trigger trigger;
-    bool guiEnabled;
-    bool boxEnabled;
+    Trigger trigger; // touch detection
+    bool guiEnabled; // gui of debugging
+    bool boxEnabled; // virtual kinect sensing field
+    int validPixelCount; // how many infrared pixels detect something
 
-    int validPixelCount;
-
-    CameraDrone staticCamera;
-    ofNode targetObject;
-    ofCamera camera;
-    ofxPd pd;
-    ofxAnimatableFloat anim;
+    // kinect and point cloud
     ofxKinect kinect;
-
-    std::vector<ofPoint> gainContour;
+    std::vector<ofPoint> gainContour; // passed to Pd table
     ofVbo gainContourVbo;
     PointCloud pointCloud;
+    Scanner scanner;
+    Spectrogram pastSpectrogram;
+    
+    //camera in OpenGL
+    ofNode lookAtObject;
+    ofxAnimatableOfPoint lookAtAnimation;
 
-    //3D spectrogram based on Pd
+    ofCamera camera;
+    ofxAnimatableOfPoint cameraAnimation;
+    
+    // pure data
+    ofxPd pd;
     std::vector<float> pdPastSpectrumBuffer;
     std::vector<float> pdFeedbackSpectrumBuffer;
     std::vector<float> pdGainBuffer;
     std::vector<float> pdMaterialBuffer;
 
-    ofxAnimatableFloat scaleAnimation;
+    //GUI
     ofxPanel gui;
-    ofxFloatSlider distance;
-    ofxFloatSlider spread;
-    ofxVec3Slider lookAt;
-    ofxVec3Slider cameraPos;
-    ofxIntSlider distThreshold;
-    Scanner scanner;
-    Spectrogram pastSpectrogram;
+    ofxFloatSlider distanceSlider;
+    ofxFloatSlider spreadSlider;
+    ofxVec3Slider lookAtSlider;
+    ofxVec3Slider cameraPosSlider;
+    ofxIntSlider distThresholdSlider;
+    
 
-    void setupGL();
+#pragma mark protectedFunction
     void audioSetup();
     void storageSetup();
     void kinectSetup();
@@ -86,6 +85,5 @@ protected:
     void drawGui();
     void updateGainContour();
 
-    void triggerInsertionCamera();
 };
 
