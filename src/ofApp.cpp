@@ -30,7 +30,7 @@ void ofApp::setupGLCamera(){
 void ofApp::setupGLBuffer(){
     pointCloud.setup();
     pastSpectrogram.setup();
-    futureSpectrogram.setup(true);
+    futureSpectrogram.setup(true, ofColor(200,200,200,255));
     guiEnabled = false;
     boxEnabled = false;
     gainContour.reserve(kKinectWidth);

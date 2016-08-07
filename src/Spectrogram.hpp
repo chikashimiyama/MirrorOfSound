@@ -5,7 +5,7 @@
 
 class Spectrogram{
 public:
-    void setup(bool rev = false);
+    void setup(bool rev = false, ofColor col = ofColor::white);
     void update(const std::vector<float> &pdSpectrumBuffer);
     void draw();
 
@@ -14,10 +14,12 @@ protected:
     std::vector<ofPoint> spectrogramVertices;
     ofVbo spectrogramVbo;
     bool reverse;
+    ofFloatColor color;
 };
 
-inline void Spectrogram::setup(bool rev){
+inline void Spectrogram::setup(bool rev, ofColor col){
     reverse = rev;
+    color = col;
     spectrogramVertices.reserve(kNumVertices);
     
     for(int i = 0; i < kNumTimeSlices; i++){
@@ -48,7 +50,7 @@ inline void Spectrogram::update(const std::vector<float> &pdSpectrumBuffer){
 }
 
 inline void Spectrogram::draw(){
-    ofSetLineWidth(1);
+    ofSetLineWidth(2);
     float step = 0.0;
     for(int i = 0; i < kNumTimeSlices;i++){
 
@@ -57,7 +59,7 @@ inline void Spectrogram::draw(){
         float alpha = reverse ? step : 1.0 - step;
         
         ofPushMatrix();
-        ofSetColor(ofFloatColor(1.0,1.0,1.0, alpha));
+        ofSetColor(ofFloatColor(color.r,color.g,color.b, alpha));
         glTranslatef(0,0,distance );
         glScalef(scale, 1, scale);
         
