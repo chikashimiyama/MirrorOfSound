@@ -10,6 +10,7 @@ void ofApp::setupGLEnvironment(){
     ofSetCircleResolution(50);
     ofSetLineWidth(0.1);
     ofEnableAlphaBlending();
+    ofSetFullscreen(true);
 }
 
 void ofApp::setupGLCamera(){
