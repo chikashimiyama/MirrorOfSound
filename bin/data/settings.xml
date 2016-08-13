@@ -1,0 +1,6 @@
+<group>
+	<lookat>-0.2, 0, 2.35</lookat>
+	<cameraPos>-3, 0.1, -0.7</cameraPos>
+	<dist_thresh>155</dist_thresh>
+<group/>
+</group>
